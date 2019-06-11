@@ -1,0 +1,10 @@
+# options for the notmattmoore account
+set from = "notmattmoore@gmail.com"
+set postponed = "+notmattmoore/[Gmail].Drafts"
+set record = "^"  # keep copies of mail in current folder
+
+# change to prev/next inbox
+macro index,pager i "<change-folder>+a91738246/INBOX<Enter>" "change folder to +a91738246/INBOX"
+macro index,pager I "<change-folder>+notmattmoore/INBOX<Enter>" "change folder to +notmattmoore/INBOX"
+# check mail
+macro index,pager <Esc>m "!mbsync notmattmoore<enter>" "Run mbsync for current account"

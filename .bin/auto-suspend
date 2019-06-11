@@ -1,0 +1,79 @@
+#!/bin/sh
+# Automatically suspend if the temperature reaches a certain threshold or if the
+# battery level reaches a certain threshold while dicharging.
+#
+# Usage: auto-suspend <temperature> <battery level>
+
+default_temp_threshold=90
+default_bat_threshold=10
+suspend_command="sudo systemctl suspend"
+
+xmsg_disp="$(ps --no-headers -f -C xinit | egrep "^$USER" | egrep -m 1 -wo ":[0-9]+")"
+xmsg_timeout=30
+xmsg_message="Suspending in $xmsg_timeout seconds!"
+xmsg_cmd="xmessage -display $xmsg_disp -timeout $xmsg_timeout -buttons Suspend:0,Cancel:1 $xmsg_message"
+
+
+ac_status_file="/sys/class/power_supply/AC/online"
+bat_dir="/sys/class/power_supply/BAT0"
+sensor_chip="coretemp-isa-0000"
+
+# log all output if not run interactively
+logfile="$HOME/.log/$(basename $0).log"
+if [ ! -t 0 ]; then
+  exec >> "$logfile" 2>&1
+  echo ""
+fi
+
+# parse agruments
+if [ "$#" = 0 ]; then
+  # default temp and bat levels to suspend on
+  temp_threshold=$default_temp_threshold
+  bat_threshold=$default_bat_threshold
+elif [ "$#" = 2 ]; then
+  # argument specified thresholds
+  temp_threshold=$1
+  bat_threshold=$2
+else
+  echo "Usage: $(basename $0) <temperature> <battery level>"
+  exit 1
+fi
+
+check_temp() {  # {{{
+  temp=$( sensors -u $sensor_chip | grep "temp1_input" | awk '{print $2}' )
+  temp=${temp%%.*}
+  [ "$temp" -gt "$temp_threshold" ] && do_suspend
+}  # }}}
+check_bat() {  # {{{
+  case $( cat "$ac_status_file" ) in
+    0) state="discharging" ;;
+    1) state="charging" ;;
+    *) state="unknown!" ;;
+  esac
+  energy_now=$( cat $bat_dir/energy_now )
+  energy_full=$( cat $bat_dir/energy_full )
+  bat=$( echo "$energy_now*100/$energy_full" | bc )
+
+  [ "$state" = "discharging" -a "$bat" -le "$bat_threshold" ] && do_suspend
+}  # }}}
+print_info() {  # {{{
+  fan=$( sensors | grep -m 1 "^fan" | awk '{ print $2 }' )
+  date -Is
+  echo "  Temperature: ${temp}°C (${temp_threshold}°C)"
+  echo "  Fan: $fan RPM"
+  echo "  Battery State: $state"
+  echo "  Battery Charge: ${bat}% (${bat_threshold}%)\n"
+}  # }}}
+do_suspend() {  # {{{
+  $xmsg_cmd
+  if [ ${?} -eq 0 ]; then
+    echo "$(date -Is): Suspending!\n"
+    $suspend_command
+  else
+    echo "$(date -Is): Suspend canceled!\n"
+  fi
+}  # }}}
+
+check_temp
+check_bat
+print_info

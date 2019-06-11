@@ -1,0 +1,51 @@
+*international: true
+
+Sxiv.background: #1f1f1f
+Sxiv.foreground: #dcdccc
+
+urxvt.font:       xft:LiberationMono:size=9
+urxvt.background: Black
+urxvt.foreground: White
+urxvt.scrollBar:  False
+
+Xcursor.theme: ComixCursors-Opaque-Slim-Black
+
+Xft.antialias: true
+Xft.dpi:       192
+Xft.hinting:   true
+Xft.hintstyle: hintslight
+Xft.lcdfilter: lcddefault
+Xft.rgba:      rgb
+
+xmessage.defaultButton: okay
+
+xscreensaver.Dialog.headingFont: -*-terminus-medium-r-*-*-28-*-*-*-*-*-*-*
+xscreensaver.Dialog.bodyFont:    -*-terminus-medium-r-*-*-28-*-*-*-*-*-*-*
+xscreensaver.Dialog.labelFont:   -*-terminus-medium-r-*-*-28-*-*-*-*-*-*-*
+xscreensaver.Dialog.unameFont:   -*-terminus-medium-r-*-*-28-*-*-*-*-*-*-*
+xscreensaver.Dialog.buttonFont:  -*-terminus-medium-r-*-*-28-*-*-*-*-*-*-*
+xscreensaver.Dialog.dateFont:    -*-terminus-medium-r-*-*-28-*-*-*-*-*-*-*
+xscreensaver.passwd.passwdFont:  -*-terminus-medium-r-*-*-28-*-*-*-*-*-*-*
+xscreensaver.Dialog.foreground:        #dcdccc
+xscreensaver.Dialog.background:        #1f1f1f
+xscreensaver.Dialog.topShadowColor:    #1f1f1f
+xscreensaver.Dialog.bottomShadowColor: #1f1f1f
+xscreensaver.Dialog.Button.foreground: #0f0f0f
+xscreensaver.Dialog.Button.background: #dcdccc
+xscreensaver.Dialog.text.foreground:     #0f0f0f
+xscreensaver.Dialog.text.background:     #dcdccc
+xscreensaver.Dialog.internalBorderWidth: 0
+xscreensaver.Dialog.borderWidth:         0
+xscreensaver.Dialog.shadowThickness:     0
+xscreensaver.passwd.thermometer.foreground:  #1f1f1f
+xscreensaver.passwd.thermometer.width:       6
+xscreensaver.newLoginCommand:
+xscreensaver.dateFormat:
+
+xterm*.foreground: White
+xterm*.background: Black
+xterm*.faceName: LiberationMono:size=9
+xterm*.termName: xterm-256color
+xterm*.bellIsUrgent: True
+xterm*.metaSendsEscape: True
+xterm*.eightBitInput: False

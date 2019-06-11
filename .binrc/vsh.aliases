@@ -1,0 +1,3 @@
+alias cp="cp --reflink=auto -i"
+alias mkdir="mkdir -p"
+alias rsend="rsync -ahz --partial --info=progress2"

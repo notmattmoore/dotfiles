@@ -1,0 +1,11 @@
+#!/bin/sh
+# synchronize mail using mbsync and do other associated tasks
+
+update_interval="5m"
+
+while true; do
+  mbsync -a
+  notmuch new
+  echo "$(date -Is): Sleeping for $update_interval..."
+  sleep "$update_interval"
+done

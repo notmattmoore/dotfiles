@@ -1,0 +1,62 @@
+#!/bin/sh
+# usage: vsh [--last|-l|--history|-h|file]
+#
+# vsh = vim shell
+# Read from standard input, put it in a vim instance, and then execute the
+# results upon exit. Log all things run this way.
+
+vim_cmd='nvim -c "set noswapfile" -c "set noundofile"'
+script_header='read -q "?Run script? [y/N] " || exit; source $HOME/.binrc/vsh.aliases'
+logsep_top="-$(date -Is)------------------------------------------------------"
+logsep_bot="--------------------------------------------------------------------------------"
+logfile="$HOME/.log/vsh.log"
+
+help_and_exit() { # {{{
+  echo "Usage: $( basename $0 ) [--last|-l|--history|-h|--edit|-e|file]"
+  rm "$script_name" 1>/dev/null 2>&1
+  exit 1
+}  # }}}
+newest_log() {  # {{{
+  if [ -f "$logfile" ]; then
+    echo "$logfile"
+  else
+    echo "$( ls "$logfile"* | sort | tail -n 1 )"
+  fi
+}  # }}}
+handle_options() {  # {{{
+  if [ "$@" = "--last" -o "$@" = "-l" ]; then
+    tac "$( newest_log )" | sed -r '2,/^-.{25}-{54}$/!d' | head --lines=-1 | tac >> "$script_name"
+  elif [ "$@" = "--history" -o "$@" = "-h" ]; then
+    cat "$( newest_log )" >> "$script_name"
+  elif [ "$@" = "--edit" -o "$@" = "-e" ]; then
+    return
+  elif [ -f "$@" ]; then
+    cat "$@" > "$script_name"
+  else
+    help_and_exit
+  fi
+}  # }}}
+
+# Create the script. Parse options if we have to.
+script_name="$( mktemp )"
+if [ $# -eq 0 ]; then     # reading stdin
+  # Append stdin to the script. Use a trap to get partial stdin for editing.
+  trap 'echo "\nvsh: caught CTRL-C" >> "$script_name"' 2
+  cat /dev/stdin >> "$script_name"
+  trap - 2    # unset the trap
+else                      # an option was given (don't read stdin)
+  handle_options "$@"
+fi
+
+# Edit the script. Use eval since the vim_cmd has quotes.
+eval $vim_cmd "$script_name" < /dev/tty
+
+# log it
+( echo "$logsep_top" && cat "$script_name" && echo "$logsep_bot" ) >> "$logfile"
+
+# execute it and then delete it (trap ctrl-c from inside zsh)
+trap 'echo "\nvsh: caught CTRL-C"' 2
+( echo "$script_header\n"; cat "$script_name" ) | sponge "$script_name"
+zsh "$script_name"
+trap - 2    # unset the trap
+rm "$script_name"

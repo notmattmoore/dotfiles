@@ -1,0 +1,55 @@
+  SXHKD_SHELL="dash"
+
+# keybindings for launching programs {{{
+# launch a terminal
+super + alt + Return
+  st
+## fzf-launcher (moved to .xmonad)
+# super + p
+#  transient-term fzf-launcher
+## fzf-surfraw
+#  transient-term fzf-surfraw
+# lock the screen
+super + x
+  xscreensaver-command -lock
+# automatically configure external or local display (don't poll)
+super + alt + d
+  external-display --poll-total 1
+# suspend
+XF86Favorites
+  try-suspend
+#----------------------------------------------------------------------------}}}
+# WM control {{{
+# goto or bring a window
+super + {_, alt} + h
+  float-term fzf-window {goto, bring}
+# xkill
+super + control + alt + Escape
+  xkill
+#----------------------------------------------------------------------------}}}
+# vim keys {{{
+# movement keys: hjkl, use shift to select
+alt + {_, shift} + {h, j, k, l}
+  xvkbd -xsendevent -no-jump-pointer -text "{_,\S}\[{Left,Down,Up,Right}]" 2>/dev/null
+# yank/paste: dyp
+alt + {d, y, p}
+  xvkbd -xsendevent -no-jump-pointer -text "\C{x,c,v}" 2>/dev/null
+# undo redo: ur
+alt + {u, r}
+  xvkbd -xsendevent -no-jump-pointer -text "\C{z,y}" 2>/dev/null
+# search: /nN
+alt + {slash, n, N}
+  xvkbd -xsendevent -no-jump-pointer -text "{\Cf,\[F3],\S\[F3]}" 2>/dev/null
+##----------------------------------------------------------------------------}}}
+
+# volume control
+{super + 0, XF86AudioMute}
+  pulsevol toggle
+{super + minus, XF86AudioLowerVolume}
+  pulsevol down
+{super + equal, XF86AudioRaiseVolume}
+  pulsevol up
+
+# brightness control
+{XF86MonBrightnessUp, XF86MonBrightnessDown}
+  sudo /usr/local/bin/brightness {up, down}

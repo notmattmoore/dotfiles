@@ -1,0 +1,12 @@
+# options for the KU account
+set from = "matthew.moore@ku.edu"
+set postponed = "+KU/Drafts"
+set record = "^"  # keep copies of mail in current folder
+
+# change to prev/next inbox
+macro index,pager i "<change-folder>+notmattmoore/INBOX<Enter>" "change folder to +notmattmoore/INBOX"
+macro index,pager I "<change-folder>+KU/INBOX<Enter>" "change folder to +KU/INBOX"
+# check mail
+macro index,pager <Esc>m "!mbsync KU<enter>" "Run mbsync for current account"
+# archive message in the teaching mailbox
+macro index,pager <Esc>a "<save-message>+archival/teaching<enter>" "Move message to archival/teaching"

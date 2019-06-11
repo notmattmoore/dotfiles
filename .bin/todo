@@ -1,0 +1,81 @@
+#!/bin/bash
+# todo -- To do list manager.
+# Usage: todo [-h|-a|-p] ...
+
+todo_file="$HOME/todo"
+
+help_exit() {  # {{{
+  name="$(basename $0)"
+  echo  "$name -- To do list manager."
+  echo "Usage: $name [-h|-p|-a|-r|-e] ..."
+  echo "  $name <item>: if item is a list of integers, remove these items from"
+  echo "               the todo list. Otherwise add item to the todo list."
+  echo "  $name -h: display this help."
+  echo "  $name -p [search]: print the to do list, optionally filtering by"
+  echo "                    search."
+  echo "  $name -a item: add item to the to do list."
+  echo "  $name -r line: remove line from the to do list."
+  echo "  $name -e: edit the to do list in vim."
+  exit 1
+} # }}}
+print_list() {  # {{{
+  # if there are no items, then exit
+  [ ! -s "$todo_file" ] && return
+
+  leader="To do:"
+  line=0
+  ( cat "$todo_file" | while read todo_item; do
+    let "line++"
+    if [ $# -eq 0 ] || ( echo "$todo_item" | grep -i -q "$@" ); then
+      echo "$leader [$line] $todo_item"
+      leader="      "
+    fi
+  done ) | column
+} # }}}
+add() { # {{{
+  echo "$@" >> $todo_file
+} # }}}
+remove() { # {{{
+  for line in $( echo $@ | tr " " "\n" | sort -nr ); do
+    if ( echo "$line" | egrep -q "^[0-9]+$" ); then
+      sed "${line}d" "$todo_file" | sponge "$todo_file"
+    else
+      echo "non-integer line number: $line."
+    fi
+  done
+} # }}}
+auto_add_remove(){  # {{{
+  # Check if input is all integers, in which case we remove those lines.
+  # Otherwise we add the input to the todo list
+  if ( echo "$@" | egrep -q "^([1-9][0-9]* *)*$" ); then
+    remove $@
+  else
+    add $@
+  fi
+}  # }}}
+
+case "$1" in
+  "-h")
+    help_exit
+  ;;
+  "-p")
+    shift
+    print_list $@
+  ;;
+  "-a")
+    [ $# -eq 1 ] && help_exit
+    shift
+    add $@
+  ;;
+  "-r")
+    [ $# -eq 1 ] && help_exit
+    shift
+    remove $@
+  ;;
+  "-e")
+    vim "$todo_file"
+  ;;
+  *)
+    [ $# -eq 0 ] && print_list $@ || auto_add_remove $@
+  ;;
+esac

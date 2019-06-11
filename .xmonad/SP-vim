@@ -1,0 +1,10 @@
+#!/bin/sh
+# attach or create a tmux session running vim (suppress status bar, too)
+
+terminal_cmd="st -n SP-vim"
+
+if tmux has-session -t notes 2> /dev/null; then
+  $terminal_cmd -e tmux attach-session -t notes
+else
+  $terminal_cmd -e tmux new-session -s notes 'vim ~/notes' \; set-option status off
+fi

@@ -1,0 +1,54 @@
+#!/bin/sh
+# Usage: presentation [on|off] [--extra-xrandr "args"]
+# Version: 2019-03-25
+
+local_display="eDP-1"
+xscreensaver_cmd="xscreensaver -no-splash -no-capture-stderr"
+
+find_connected_external_display(){  # {{{
+  # output the first connected external display.
+  xrandr \
+    | egrep '^[^ ]+ connected' \
+    | egrep -v -m 1 "^$local_display connected" \
+    | awk '{print $1}'
+}  # }}}
+xrandr_turnoff_disconn() {  # {{{
+  # find displays that are disconnected by still configured, then echo the
+  # xrandr arguments to turn them off
+  xrandr \
+    | egrep '^[^ ]+ disconnected [0-9x\+]+' \
+    | awk '{print "--output " $1 " --off"}' \
+    | tr '\n' ' '
+}  # }}}
+
+[ "$2" = "--extra-xrandr" ] && xrandr_extra_args="$3"
+
+case "$1" in
+  "on")
+    external_display="$( find_connected_external_display )"
+    if [ -z "$external_display" ]; then
+      echo "No connected external displays found."
+      exit
+    fi
+
+    xrandr --output "$external_display" --auto --above "$local_display" \
+      $( xrandr_turnoff_disconn ) \
+      $xrandr_extra_args
+
+    killall xscreensaver
+    ;;
+  "off")
+    external_display="$( find_connected_external_display )"
+
+    xrandr --output "$local_display" --auto \
+      --output "$external_display" --off \
+      $( xrandr_turnoff_disconn "$xrandr_output" ) \
+      $xrandr_extra_args
+
+    $xscreensaver_cmd &
+    ;;
+  *)
+    echo "presentation [on|off] [--extra-xrandr \"args\"]"
+    exit
+    ;;
+esac

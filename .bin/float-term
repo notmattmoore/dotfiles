@@ -1,0 +1,12 @@
+#!/bin/sh
+# Usage: float-term [-g <geometry>] <script> [args]
+# The script must be in the PATH or be full.
+
+geometry="80x12"
+if [ "$1" = "-g" ]; then
+  geometry=$2
+  shift; shift
+fi
+script_name=$( basename "$1" )
+
+st -c "float-term" -n "$script_name" -t "$script_name" -g $geometry -e "$@" 2>/dev/null

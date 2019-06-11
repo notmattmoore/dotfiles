@@ -1,0 +1,12 @@
+# options for the a91738246 account
+set from = "a91738246@gmail.com"
+set postponed = "+a91738246/[Gmail].Drafts"
+set record = "^"  # keep copies of mail in current folder
+
+# change to prev/next inbox
+macro index,pager i "<change-folder>+KU/INBOX<Enter>" "change folder to +KU/INBOX"
+macro index,pager I "<change-folder>+a91738246/INBOX<Enter>" "change folder to +a91738246/INBOX"
+# check mail
+macro index,pager <Esc>m "!mbsync a91738246<enter>" "Run mbsync for current account"
+# archive message to purchases
+macro index,pager <Esc>a "<save-message>+archival/purchases<enter>" "Move message to archival/purchases"

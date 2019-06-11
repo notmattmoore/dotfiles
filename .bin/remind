@@ -1,0 +1,13 @@
+#!/bin/sh
+
+D="$(ps --no-headers -f -C xinit | egrep "^${USER}" | egrep -m 1 -wo ":[0-9]+")"
+
+case "$@" in 
+  "at "*) A="$(echo $@ | cut -c 4-)" ;;
+  "in "*) A="now + $(echo $@ | cut -c 4-)" ;;
+  *) A="now + $@" ;;
+esac
+
+at "${A}" << _EOF_
+xmessage -display "${D}" 'Reminder!'
+_EOF_

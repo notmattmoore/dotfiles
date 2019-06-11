@@ -1,0 +1,11 @@
+#!/usr/bin/ipython
+# a python interactive calculator
+
+# imports {{{
+from __future__ import division
+from sympy import *
+#----------------------------------------------------------------------------}}}
+
+x, y, z = symbols('x y z')
+k, m, n = symbols('k m n', integer=True)
+init_printing(use_unicode=True)

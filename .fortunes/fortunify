@@ -1,0 +1,12 @@
+#!/bin/sh
+# Usage: fortunify <quotes>
+# Desc:  Processes a quotes file using strfile if needed. Comments in the source
+#        file are supported, in contrast to plain strfile.
+
+fortune_name="$HOME/.fortunes/$( basename "$1" )"
+
+# exit if we don't need to update the fortunes
+[ "$1" -nt "${fortune_name}.dat" ] || exit
+
+sed -E 's/^#.*/%/' "$1" > "$fortune_name"
+strfile -s "$fortune_name"
