@@ -39,7 +39,6 @@ set sort = threads         # sort by thread dates
 set auto_tag = yes         # when messages are tagged, allow bulk actions
 set reverse_alias = yes    # show names from aliases if we have it
 set mark_old = no          # don't mark new messages as old if I don't read them
-set collapse_unread = no   # don't collapse threads containg unread messages
 set hide_thread_subject = yes    # don't show subject in threads if it hasn't changed
 source "$HOME/.mutt/mailboxes"   # a file containing a list of mailboxes to watch for mail
 set sort_aux = reverse-last-date-received  # in the threads sort by last recieved
@@ -135,7 +134,7 @@ macro index,pager A "<save-message>+archival/INBOX<Enter>" "move message to arch
 # check mail
 macro index,pager <Esc>m "!mbsync -a<enter>" "run mbsync for all accounts"
 
-# use urlscan to extract links from a message
+# open a copy of the message in vim
 macro index,pager \Co "<pipe-message> vim \"+/^$/+\" -c \"set ft=mail\" -<Enter>" "edit message in a floating vim window"
 
 # search using notmuch

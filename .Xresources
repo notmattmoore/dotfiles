@@ -44,7 +44,7 @@ xscreensaver.dateFormat:
 
 xterm*.foreground: White
 xterm*.background: Black
-xterm*.faceName: LiberationMono:size=9
+xterm*.faceName: DejaVuSansMono:size=9
 xterm*.termName: xterm-256color
 xterm*.bellIsUrgent: True
 xterm*.metaSendsEscape: True
