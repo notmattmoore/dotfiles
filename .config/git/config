@@ -1,0 +1,5 @@
+[core]
+  sshCommand = "ssh -i ~/.ssh/git"
+[user]
+  email = matthew.moore@ku.edu
+  name = Matthew Moore

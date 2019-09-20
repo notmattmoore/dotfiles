@@ -49,14 +49,30 @@ endif
 let g:EasyTemplates_JumpForwardTrigger = "<C-j>"
 let g:EasyTemplates_JumpBackwardTrigger = "<C-k>"
 
+" fugitive for git integration
+" \gs, \gc, \gm    interactive git status/commit/merge
+" \gr    git rebase
+" \gg              git command line interface
+" :Gw   write and stage file
+Plug 'tpope/vim-fugitive'
+nnoremap <leader>gs :Gstatus<CR>
+nnoremap <leader>gc :Gcommit<CR>
+nnoremap <leader>gm :Gmerge <Tab>
+nnoremap <leader>gr :Grebase <Tab>
+nnoremap <leader>gg :Git <Tab>
+
 " fzf integration for fuzzy finding
-" <C-f>   open a file
-" <C-/>   search lines in current bufer
+" <C-f>, <C-b>   open a file or buffer
+" <C-/>          search lines in current bufer
+" <C-F1>, <C-s>  use fzf to search vim help, snippets
 Plug 'junegunn/fzf.vim'
 let g:fzf_layout = { 'down': '~33%' }   " fzf window in the bottom 1/3
 let $FZF_DEFAULT_OPTS = "--inline-info --cycle --bind=tab:down,shift-tab:up,alt-enter:print-query,ctrl-space:replace-query,right:replace-query"
 nnoremap <C-f> :Files<CR>
+nnoremap <C-b> :Buffers<CR>
 nnoremap <C-_> :BLines<CR>
+nnoremap <C-F1> :Helptags<CR>
+nnoremap <C-S> :Snippets<CR>
 
 " incsearch for better incremental searching
 Plug 'haya14busa/incsearch.vim'
@@ -206,12 +222,20 @@ let g:zenburn_unified_CursorColumn = 1  " make the cursorcolumn fit in
 call plug#end()
 "---------------------------------------------------------------------------}}}1
 " status line {{{1
-set statusline=%t                 " <tail of the filename>
-set statusline+=\ \│\ %y          " ' │ '<the filetype>
-set statusline+=%m%r%h%w%q        " <modified?readonly?help?preview?quickfix?>
-set statusline+=%=                " left/right separator
-set statusline+=\ (%v,%l)         "' (<virtual column>,<line>)'
-set statusline+=\ %3p%%           " ' '<percent of file current line is at>%
+set statusline=%t                     " <tail of the filename>
+set statusline+=\ \│\ %y              " ' │ '<the filetype>
+set statusline+=%m%r%h%w%q            " <modified?readonly?help?preview?quickfix?>
+set statusline+=%{MyGitStatusLine()}  " git status, uses fugitive plugin
+set statusline+=%=                    " left/right separator
+set statusline+=\ (%v,%l)             "' (<virtual column>,<line>)'
+set statusline+=\ %3p%%               " ' '<percent of file current line is at>%
+
+function! MyGitStatusLine(...) abort
+  if !exists('b:git_dir')
+    return ''
+  endif
+  return ' │ ' . fugitive#Statusline()
+endfunction
 "---------------------------------------------------------------------------}}}1
 " interface settings {{{1
 colorscheme zenburn               " use zenburn
@@ -237,6 +261,7 @@ set splitright                    " open new vsplits to the right
 set nostartofline                 " try to keep the curson in the same column
 set termguicolors                 " nice colors in the terminal
 set virtualedit=block             " allow moving past EOL in visual block
+set wildcharm=<Tab>
 set wildmode=longest:full         " on first tab, match longest common string and show menu
 set wildmode+=full                " on second tab, cycle full matches
 "---------------------------------------------------------------------------}}}1
@@ -290,7 +315,7 @@ vnoremap K k
 noremap j gj
 noremap k gk
 " map p in visual mode not to overwrite the paste register
-vnoremap <silent> p p:let @+=@0 \| let @"=@+<CR>
+vnoremap <silent> p pgvy
 " make Q format, not enter ex mode
 noremap Q gq
 " make Y work like it should

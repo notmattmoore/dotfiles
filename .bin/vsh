@@ -1,5 +1,5 @@
 #!/bin/sh
-# usage: vsh [--last|-l|--history|-h|file]
+# Usage: vsh [--last|-l|--history|-h|--edit|-e|file]
 #
 # vsh = vim shell
 # Read from standard input, put it in a vim instance, and then execute the
@@ -12,9 +12,11 @@ logsep_bot="--------------------------------------------------------------------
 logfile="$HOME/.log/vsh.log"
 
 help_and_exit() { # {{{
-  echo "Usage: $( basename $0 ) [--last|-l|--history|-h|--edit|-e|file]"
-  rm "$script_name" 1>/dev/null 2>&1
-  exit 1
+cat <<EOF
+Usage: $( basename $0 ) [--last|-l|--history|-h|--edit|-e|file]
+EOF
+rm "$script_name" 1>/dev/null 2>&1
+exit 1
 }  # }}}
 newest_log() {  # {{{
   if [ -f "$logfile" ]; then

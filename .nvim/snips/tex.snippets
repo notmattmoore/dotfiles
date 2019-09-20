@@ -1,0 +1,128 @@
+priority -50
+
+# global python functions {{{1
+global !p
+def _parensHelper(s): # {{{
+  try:
+    L = s[1].split(' ')[0]
+    if L == 'big': rv = 'big'
+    elif L == 'left': rv = 'right'
+    else: rv = L
+
+    P = s[2].split(' ')[0]
+    if P == '(': rv += ')'
+    elif P == '[': rv += ']'
+    elif P == '\{': rv += '\}'
+    elif P == '<': rv += '>'
+    else: rv += P
+  except:
+    rv = ""
+
+  return rv
+#--------------------------------------------------------------------------}}}
+def _alignHelper(s):  # {{{
+  # delete the top line if it's \[
+  r = re.compile(r"^ *\\\[ *\n").sub("", s, count=1)  
+  # delete the last line if it's \]
+  r = re.compile(r"\n *\\\] *$").sub("", r, count=1)
+  # delete trailing newline. For some reason this cannot be combined with above.
+  r = re.compile(r"\n$").sub("", r, count=1)
+
+  return r
+#----------------------------------------------------------------------------}}}
+endglobal
+#---------------------------------------------------------------------------}}}1
+
+# inline math {{{1
+snippet "\$+" "$ ... $" wr
+\$${VISUAL}${1}\$
+endsnippet
+
+snippet "\\fra?c?" "\frac{...}{...}" wr
+\frac{${VISUAL}${1}}{${2}}
+endsnippet
+
+snippet "\(+" "\left_ ... \right_" wr
+\\${1:left}${2:(} ${VISUAL}${3} \\`!p snip.rv=_parensHelper(t)`
+endsnippet
+
+snippet "\^\^?" "^{...}" ir
+^{${VISUAL}${1}}
+endsnippet
+
+snippet "__?" "_{...}" ir
+_{${VISUAL}${1}}
+endsnippet
+#---------------------------------------------------------------------------}}}1
+# environments {{{1
+snippet \[ "\[ ... \]" b
+\[
+  ${VISUAL}${1}
+\]
+endsnippet
+
+snippet "\\b(e(g(i(n)?)?)?)?" "\begin{} ... \end{}" r
+\begin{${1:env}}
+  ${VISUAL}${2}
+\end{$1}
+endsnippet
+
+snippet "al(i(g(n)?)?)?" "\begin{align} ... \end{align}" br
+\begin{align${1:*}}
+`!p snip.rv=_alignHelper(snip.v.text)`${2}
+\end{align$1}
+endsnippet
+
+snippet "tab(u(l(a(r)?)?)?)?" "\begin{tabular} ... \end{tabular}" br
+\begin{tabular}[${1:alignment}]
+  ${VISUAL}${2}
+\end{tabular}
+endsnippet
+
+snippet "enum(e(r(a(t(e)?)?)?)?)?" "\begin{enumerate} ... \end{enumerate}" br
+\begin{enumerate}
+  \item $1
+\end{enumerate}
+endsnippet
+
+snippet "item(i(z(e)?)?)?" "\begin{itemize} ... \end{itemize}" br
+\begin{itemize}
+  \item $1
+\end{itemize}
+endsnippet
+#----------------------------------------------------------------------------}}}1
+# chapters, sections, subsections {{{1
+snippet "\\?chap(t(e(r)?)?)?" "\chapter{} \label{chap:}" br
+\chapter{${1:name}} \label{chap:${2:name}} % {{{${3:1}
+${4:content}
+%---------------------------------------------------------------------------}}}$3
+endsnippet
+
+snippet "\\?sec(t(i(o(n)?)?)?)?" "\section{} \label{sec:}" br
+\section{${1:name}} \label{sec:${2:name}} % {{{${3:1}
+${4:content}
+%---------------------------------------------------------------------------}}}$3
+endsnippet
+
+snippet "\\?sub(s(e(c(t(i(o(n)?)?)?)?)?)?)?" "\subsection{} \label{subsec:}" br
+\subsection{${1:name}} \label{subsec:${2:name}} % {{{${3:2}
+${4:content}
+%---------------------------------------------------------------------------}}}$3
+endsnippet
+#---------------------------------------------------------------------------}}}1
+
+# quantum {{{1
+snippet "\|([^ |><]+)>?" "\ket{ ... }" ir
+\ket{`!p snip.rv = match.group(1)`${VISUAL}}
+endsnippet
+
+snippet "<([^ |><]+)\|?>" "\bra{ ... }" ir
+\bra{`!p snip.rv = match.group(1)`${VISUAL}}
+endsnippet
+#----------------------------------------------------------------------------}}}1
+
+# algorithms {{{1
+snippet ";(;|\$)" ";$ ... $;" ir
+;\$${VISUAL}${1}\$;
+endsnippet
+#----------------------------------------------------------------------------}}}1
