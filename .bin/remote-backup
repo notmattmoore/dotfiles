@@ -1,0 +1,40 @@
+#!/bin/sh
+
+hosts="lambda.rsync
+  iota.rsync
+  alephnull.rsync"
+src="$HOME/"
+dest="/srv/backups/$(hostname)-$USER.bak/"
+filter="$HOME/.binrc/remote-backup.filter"
+date_cmd="date -Is | cut -d '-' -f -3 | tr 'T' ' '"
+rsync_cmd="rsync \
+  --archive \
+  --hard-links \
+  --delete \
+  --force \
+  --filter=\"merge $filter\" \
+  --human-readable \
+  --info=progress2"
+
+# display output only if run interactively, otherwise log it
+stdout="/dev/stdout"
+stderr="/dev/stderr"
+if [ ! -t 0 ]; then
+  exec >> "$HOME/.log/$(basename $0).log" 2>&1
+  stdout="/dev/null"
+  stderr="/dev/null"
+fi
+
+# don't try backing up unless we're on wifi
+network_type="$(nmcli -t device status | grep -m 1 "connected" | cut -d ':' -f 2)"
+[ "$network_type" != "wifi" ] \
+  && echo "$(eval $date_cmd): Connected to $network_type (not wifi), so not backing up." \
+  && exit
+
+echo "$(eval $date_cmd): Attempting to backup $src..."
+for host in $hosts; do
+  status="failed"
+  eval $rsync_cmd "$src" "$host:$dest" > "$stdout" 2> "$stderr" \
+    && status="succeeded"
+  echo "$(eval $date_cmd): Backup of $src to $host $status."
+done

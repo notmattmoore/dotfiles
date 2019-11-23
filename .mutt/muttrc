@@ -68,7 +68,7 @@ alternative_order text/plain text/enriched text/html  # show html last
 auto_view text/html                                   # auto display these mime-types
 #----------------------------------------------------------------------------}}}1
 # compose options {{{1
-set editor = 'nvim "+/^$/+" -c "noh"'  # use vim, position cursor on first blank line
+set editor = 'vim "+/^$/+" -c "noh"'  # use vim, position cursor on first blank line
 set sendmail = "/usr/bin/msmtp"        # send mail with msmtp
 set query_command="goobook query '%s'" # use goobook for address lookup
 set use_envelope_from = yes   # make mutt add -f to sendmail so it sends from the right account
@@ -91,7 +91,6 @@ unignore Organization:
 unignore Newsgroups:
 unignore User-Agent:
 unignore X-Mailer:
-
 #----------------------------------------------------------------------------}}}1
 # multiple account options  {{{1
 set realname = "Matthew Moore"                  # appears as name in mails

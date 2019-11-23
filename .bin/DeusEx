@@ -1,0 +1,6 @@
+#!/bin/sh
+
+DEUSEX_PATH="${HOME}/.wine/drive_c/Deus Ex/System"
+
+wine "${DEUSEX_PATH}/deusex.exe" -localdata -hax0r
+xgamma -gamma 1

@@ -1,0 +1,87 @@
+#!/bin/sh
+# elvis: duckduckgo -- Securely search the web using duckduckgo (duckduckgo.com)
+
+. surfraw || exit 1
+
+w3_config_hook () {
+  def     SURFRAW_duckduckgo_base_url            "duckduckgo.com"
+  def     SURFRAW_duckduckgo_search              search
+  def     SURFRAW_duckduckgo_params              "&kg=g"
+  defyn   SURFRAW_duckduckgo_https_arg           0
+  defyn   SURFRAW_duckduckgo_safe_arg            0
+  defyn   SURFRAW_duckduckgo_redirect_arg        0
+  defyn   SURFRAW_duckduckgo_no_javascript       0
+  defyn   SURFRAW_duckduckgo_got_a_ducky_feeling 0
+}
+
+w3_usage_hook () {
+  cat <<EOF
+Usage: $w3_argv0 [options] [search words]...
+Description:
+  Surfraw search the web using DuckDuckGo (duckduckgo.com)
+Local options:
+  -i, -images                 image search
+  -v, -videos                 video search
+  -d, -ducky, -l, -lucky      "I'm feeling ducky" search
+  -safe                       enable safe search
+  -no-javascript              don't use javascript
+  -r, -redirect               use redirection
+  -s,-insecure                disable SSL search
+EOF
+  w3_global_usage
+}
+
+w3_parse_option_hook () {
+  opt="$1"
+  optarg="$2"
+  case "$opt" in
+    -i|-images)           setopt   SURFRAW_duckduckgo_search         images ;;
+    -v|-videos)           setopt   SURFRAW_duckduckgo_search         videos ;;
+    -d|-ducky|-l|-lucky)  setoptyn SURFRAW_duckduckgo_got_a_ducky_feeling 1 ;;
+    -safe)                setoptyn SURFRAW_duckduckgo_safe_arg            1 ;;
+    -no-javascript)       setoptyn SURFRAW_duckduckgo_no_javascript       1 ;;
+    -r|-redirect)         setoptyn SURFRAW_duckduckgo_redirect_arg        1 ;;
+    -s|-insecure)         setoptyn SURFRAW_duckduckgo_https_arg           1 ;;
+    *) return 1 ;;
+  esac
+  return 0
+}
+
+w3_config
+w3_parse_args "$@"
+escaped_args=`w3_url_of_arg $w3_args`
+# w3_args now contains a list of arguments
+
+if [ "${SURFRAW_duckduckgo_search}" = "images" ]; then
+  SURFRAW_duckduckgo_params="${SURFRAW_duckduckgo_params}&iax=images&ia=images"
+elif [ "${SURFRAW_duckduckgo_search}" = "videos" ]; then
+  SURFRAW_duckduckgo_params="${SURFRAW_duckduckgo_params}&iax=videos&ia=videos"
+fi
+
+if [ "$SURFRAW_duckduckgo_got_a_ducky_feeling" = 1 ]; then
+    escaped_args="! ${escaped_args}"
+fi
+
+if [ "$SURFRAW_duckduckgo_safe_arg" = 1 ]; then
+    SURFRAW_duckduckgo_params="${SURFRAW_duckduckgo_params}&kp=1"
+fi
+
+if [ "$SURFRAW_duckduckgo_no_javascript" = 1 ]; then
+    SURFRAW_duckduckgo_base_url="${SURFRAW_duckduckgo_base_url}/lite"
+fi
+
+if [ "$SURFRAW_duckduckgo_redirect_arg" = 1 ] ; then
+    SURFRAW_duckduckgo_params="${SURFRAW_duckduckgo_params}&kd=1"
+fi
+
+if [ "${SURFRAW_duckduckgo_https_arg}" = 0 ] ; then
+    SURFRAW_duckduckgo_base_url="https://${SURFRAW_duckduckgo_base_url}"
+else
+    SURFRAW_duckduckgo_base_url="http://${SURFRAW_duckduckgo_base_url}"
+fi
+
+if [ "$SURFRAW_graphical" != "yes" ] ; then
+    SURFRAW_duckduckgo_params="${SURFRAW_duckduckgo_params}&kf=-1&kz=-1&kq=-1&kv=-1"
+fi
+
+w3_browse_url "${SURFRAW_duckduckgo_base_url}/?q=${escaped_args}${SURFRAW_duckduckgo_params}"

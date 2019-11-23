@@ -112,11 +112,11 @@ endsnippet
 #---------------------------------------------------------------------------}}}1
 
 # quantum {{{1
-snippet "\|([^ |><]+)>?" "\ket{ ... }" ir
+snippet "\|([^ |>]+)>?" "\ket{ ... }" ir
 \ket{`!p snip.rv = match.group(1)`${VISUAL}}
 endsnippet
 
-snippet "<([^ |><]+)\|?>" "\bra{ ... }" ir
+snippet "<([^ |>]+)\|?" "\bra{ ... }" ir
 \bra{`!p snip.rv = match.group(1)`${VISUAL}}
 endsnippet
 #----------------------------------------------------------------------------}}}1

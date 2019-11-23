@@ -1,35 +1,31 @@
 #!/bin/sh
 # fzf interface to surfraw
 
+elvi_location="$HOME/.binrc/surfraw"
+default_elvi="duckduckgo"
+
 export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
   --bind=enter:replace-query+print-query --prompt='Surfraw: '"
-default_elvi="duckduckgo"
-cache_file="$HOME/.binrc/fzf-surfraw_cache"
-custom_file="$HOME/.binrc/fzf-surfraw_custom"
+PATH="$PATH:$elvi_location"
 
 name=$( basename "$0" )
 fifo_name=/tmp/${name}_${USER}
 
-# Update the list of elvis (first 2 lines aren't usable). Add a space at the
-# end of each line so that completion is nicer.
-surfraw -elvi | tail --lines=+3 | awk '{print $1" "}' > $cache_file
-
 while true; do
-  query=$( cat $cache_file $custom_file | fzf )
+  # list the evli's, place a space after each name for nicer completion
+  query=$( ls "$elvi_location" | awk '{print $1" "}' | fzf )
 
   # signal the caller that we can go back to the scratch workspace
   [ -p $fifo_name ] && echo 1 > $fifo_name || exit
 
   # If query is non-empty then search for it it.
   if [ -n "$query" ]; then
-    # If we don't see the first word as an elvi, then use duckduckgo. Note the
-    # space in the awk command!
-    if [ -z $(grep -x "$(echo "$query" | awk '{print $1" "}')" $cache_file) ]; then
+    # If we don't see the first word as an elvi, then use the default.
+    if [ -z $(ls "$elvi_location" | grep -x -m 1 "$(echo "$query" | awk '{print $1}')") ]; then
       query="$default_elvi $query"
     fi
 
     # run surfraw
-    setsid surfraw $query 1>/dev/null 2>&1
+    setsid $elvi_location/$query 1>/dev/null 2>&1 &
   fi
-
 done

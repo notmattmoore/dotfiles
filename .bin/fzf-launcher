@@ -2,10 +2,11 @@
 # Use fzf to filter a list of programs and run the result. Works with
 # transient-term.
 
-export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
-  --bind=enter:replace-query+print-query --prompt='∴ '"
 hist_file="$HOME/.binrc/fzf-launcher_history"
 hist_size=25
+
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
+  --bind=enter:replace-query+print-query --prompt='∴ '"
 
 name="$(basename "$0")"
 fifo_name="/tmp/${name}_${USER}"

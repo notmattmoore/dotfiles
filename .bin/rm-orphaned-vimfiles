@@ -1,0 +1,38 @@
+#!/bin/sh
+# find and delete all orphaned vim undofiles and swapfiles
+
+MAX_AGE=50             # max age before deleting
+
+
+# log all output if not run interactively
+LOGFILE="${HOME}/.log/$(basename ${0}).log"
+if [ ! -t 0 ]; then
+  exec >> "${LOGFILE}" 2>&1
+fi
+
+rm_undofiles() {  # {{{
+# delete undofiles that don't have a parent file
+
+  find "${HOME}" -type f -iname '*.un~' | while read UNDOFILE ; do
+    FILE=$(echo "${UNDOFILE}" | sed -r -e "s/\/\.([^\/]*)\.un~$/\/\1/")
+    # if the file does not exist...
+    if ! [ -e "${FILE}" ]; then 
+      rm -v "${UNDOFILE}"
+    fi
+  done
+}  # }}}
+rm_swapfiles() {  # {{{
+# delete swapfiles that are older than MAX_AGE
+
+  # find uses > instead of >= for time comparisions
+  MAX_AGE=$(echo "${MAX_AGE}-1" | bc)
+  find "${HOME}" -type f -iname '*.sw?' -atime +${MAX_AGE} | while read SWAP_FILE; do
+    # if it is a vim swap file and is not currently open...
+    if [ $(file -b -p "${SWAP_FILE}" | grep -ci "^vim") -eq 1 -a -n "$( lsof -t "${SWAP_FILE}")" ]; then
+      rm -v "${SWAP_FILE}"
+    fi
+  done
+}  # }}}
+
+rm_undofiles
+rm_swapfiles

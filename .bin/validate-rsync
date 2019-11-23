@@ -1,0 +1,19 @@
+#!/bin/sh
+# Version: 2019-09-16
+
+logfile="$HOME/.log/$(basename $0).log"
+echo "On $(date)..." >> "$logfile"
+echo "  From/To: ${SSH_CONNECTION}" >> "$logfile"
+echo "  Command: ${SSH_ORIGINAL_COMMAND}" >> "$logfile"
+
+deny() {  # {{{
+  echo "Access Denied (failed validation)"
+  echo "  Access Denied" >> "$logfile"
+  exit
+}  # }}}
+
+( echo "$SSH_ORIGINAL_COMMAND" | egrep -qx 'rsync --server .*(\.bak|math_comp)/?' ) \
+  || deny
+
+echo "  Access Granted" >> "$logfile"
+$SSH_ORIGINAL_COMMAND

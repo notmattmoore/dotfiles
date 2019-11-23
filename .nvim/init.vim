@@ -38,9 +38,8 @@ nnoremap <leader>b :ToggleBufExplorer<CR>
 if has('nvim')
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
   let g:deoplete#enable_at_startup = 1
-  let g:deoplete#auto_complete_delay = 500
-  "let g:deoplete#disable_auto_complete = 1
-  inoremap <expr> <C-n> deoplete#mappings#manual_complete()
+  let g:deoplete#auto_complete_delay = 250
+  inoremap <silent><expr> <C-n> deoplete#manual_complete()
   Plug 'zchee/deoplete-jedi'    " use jedi for python
 endif
 
@@ -51,15 +50,16 @@ let g:EasyTemplates_JumpBackwardTrigger = "<C-k>"
 
 " fugitive for git integration
 " \gs, \gc, \gm    interactive git status/commit/merge
-" \gr    git rebase
+" \gr, \gS         git rebase, stash
 " \gg              git command line interface
 " :Gw   write and stage file
 Plug 'tpope/vim-fugitive'
 nnoremap <leader>gs :Gstatus<CR>
-nnoremap <leader>gc :Gcommit<CR>
 nnoremap <leader>gm :Gmerge <Tab>
-nnoremap <leader>gr :Grebase <Tab>
+nnoremap <leader>gr :Grebase master
 nnoremap <leader>gg :Git <Tab>
+nnoremap <leader>gc :Git checkout <Tab>
+nnoremap <leader>gS :Git stash
 
 " fzf integration for fuzzy finding
 " <C-f>, <C-b>   open a file or buffer
@@ -105,6 +105,7 @@ Plug 'tpope/vim-repeat'
 " sneak for fast movements
 " sxy, Sxy         jump to chars xy
 " fx, Fx, tx, Tx   jump to char x, repeat f to keep going
+" <Tab>            use next set of labels in label mode
 Plug 'justinmk/vim-sneak'
 let g:sneak#label = 1       " use label-mode for easy navigation
 let g:sneak#s_next = 1      " keep pressing s/f to repeat sneak
@@ -120,7 +121,6 @@ augroup SneakPluginColors
   autocmd ColorScheme * hi Sneak guifg=red guibg=NONE gui=underline,bold ctermfg=red ctermbg=NONE cterm=underline,bold
   autocmd ColorScheme * hi SneakLabel guifg=#1f1f1f guibg=#dcdccc gui=bold ctermfg=234 ctermbg=188 cterm=bold
 augroup END
-let g:sneak#target_labels = "ftunq"
 
 " suda for using sudo to write files
 " workaround for bug https://github.com/neovim/neovim/issues/1716

@@ -175,7 +175,8 @@ smartDecreaseLimit = do
   (prim, sec) <- getPrimSecLayout
   if prim == "Limit" then decreaseLimit
   else if prim == "Grid" then do
-    setPrimSecLayout "Limit" sec
+    if sec /= "Limit" then setPrimSecLayout "Limit" sec
+    else                   setPrimSecLayout "Limit" "Grid"
     w <- gets windowset
     setLimit $ pred . length . W.index $ w
   else return ()

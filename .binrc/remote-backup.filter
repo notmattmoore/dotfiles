@@ -1,0 +1,20 @@
+# As the list of files/directories to transfer is built, rsync checks each name
+# against the filters. The first matching pattern is acted on. If no matching
+# pattern is found, then the filename is not skipped. Matches are for the
+# *destination* filename.
+#
+# Directory traversal is lazy, which is why the rules look funny.
+
+exclude /.bitmonero/
+exclude /.cache/
+exclude /.config/google-chrome/
+exclude /music/
+exclude /personal/audiobooks/
+exclude /technical/*.bak
+exclude /technical/*.img
+exclude /technical/*.iso
+exclude /technical/virt/
+exclude /tmp/
+exclude /video/
+exclude /zmisc/
+include **

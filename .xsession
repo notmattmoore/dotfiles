@@ -19,7 +19,7 @@ sxhkd &                                    # set up the X keyboard bindings
 xrandr --dpi 192                           # the DPI
 xsetroot -solid "#1f1f1f"                  # set background dark grey
 lxpolkit &                                 # policykit agent
-unclutter -grab -reset &                   # hide the pointer after a key is pressed
+unclutter-xfixes &                         # hide the pointer after a key is pressed
 start-pulseaudio-x11                       # audio, backrounding makes it defunct
 mpd                                        # music player, backgrounding makes it defunct
 xscreensaver -no-splash -no-capture-stderr &  # the screensaver daemon
