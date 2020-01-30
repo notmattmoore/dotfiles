@@ -7,6 +7,6 @@ if tmux has-session -t SP 2> /dev/null; then
   $terminal_cmd -e tmux attach-session -t SP
 else
   $terminal_cmd -e tmux new-session -s SP "htop"  \
-    \; new-window "dmesg -Tw"  \
+    \; new-window "dmesg -HPw"  \
     \; new-window
 fi

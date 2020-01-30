@@ -1,6 +1,6 @@
 #!/bin/bash
 # A simple interactive filter reading from stdin
-# Usage: simple-filter [(-p|-prompt) "Query:"] 
+# Usage: simple-filter [(-p|--prompt) "Query:"] 
 #                      [-r|--read]
 #                      [--query-pre "pre"]
 #                      [--query-sep "sep"]

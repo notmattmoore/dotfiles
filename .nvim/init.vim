@@ -99,6 +99,9 @@ let g:mundo_right = 1            " put sidebar on the right
 let g:mundo_width = 30           " make sidebar 30 wide
 nnoremap <leader>u :MundoToggle<CR>
 
+" netrw (already loaded)
+let g:netrw_browsex_viewer="google-chrome"
+
 " repeat for repeating plugin actions
 Plug 'tpope/vim-repeat'
 

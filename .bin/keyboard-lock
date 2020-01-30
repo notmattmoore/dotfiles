@@ -2,7 +2,7 @@
 # Lock the keyboard for a specified duration (or the default)
 # Usage: keyboard-lock [duration]
 
-DURATION=10
+duration="10s"
 xinput_cmd='xinput set-prop "AT Translated Set 2 keyboard" "Device Enabled"'
 
 # enable the keyboard on exit
@@ -10,22 +10,21 @@ trap "keyboard_cmd 1; exit" 0 1 2 3 15
 
 usage(){ # {{{
 cat <<EOF
-Usage: $(basename $0) [duration]
+Usage: $(basename $0) [duration (default: $duration)]
 EOF
 } # }}}
 keyboard_cmd(){ # {{{
   echo "Running $xinput_cmd $1 ..."
   eval $xinput_cmd $1
-  date >> ./aaa
 } # }}}
 
 
 if [ $# -eq 1 ]; then
-  DURATION=$1
+  duration=$1
 elif [ $# -gt 1 ]; then
   usage && exit
 fi
 
 keyboard_cmd 0 \
-  && echo "Sleeping for ${DURATION}s" \
-  && sleep $DURATION
+  && echo "Sleeping for ${duration}" \
+  && sleep $duration

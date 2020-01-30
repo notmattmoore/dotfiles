@@ -39,9 +39,10 @@ inoremap <buffer> `6 \partial
 "----------------------------------------------------------------------------}}}
 "----------------------------------------------------------------------------}}}1
 " latex-box {{{1
+imap <buffer> ]] <Plug>LatexCloseCurEnv
+
 let g:LatexBox_viewer = "zathura"
 let g:LatexBox_quickfix = 2   " quickfix window doesn't steal focus
-imap <buffer> ]] <Plug>LatexCloseCurEnv
 "----------------------------------------------------------------------------}}}1
 " tagbar {{{1
 " make tagbar work with tex and bib files (also need to add stuff to ~/.ctags)
