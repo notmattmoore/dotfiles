@@ -1,0 +1,7 @@
+#!/bin/sh
+# create/attach to a tmux new session with the current desktop name
+
+session_name="$( wmctrl -d | egrep -m 1 '^[0-9]+ +\*' | awk '{print $9}' )"
+
+# run tmux (use exec to replace this process)
+exec tmux new -A -s "$session_name"
