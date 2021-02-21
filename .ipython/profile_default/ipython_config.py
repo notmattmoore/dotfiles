@@ -165,7 +165,7 @@ c.TerminalIPythonApp.force_interact = True
 #c.InteractiveShell.automagic = True
 
 ## The part of the banner to be printed before the profile
-#c.InteractiveShell.banner1 = 'Python 2.7.14+ (default, Feb  6 2018, 19:12:18) \nType "copyright", "credits" or "license" for more information.\n\nIPython 5.5.0 -- An enhanced Interactive Python.\n?         -> Introduction and overview of IPython\'s features.\n%quickref -> Quick reference.\nhelp      -> Python\'s own help system.\nobject?   -> Details about \'object\', use \'object??\' for extra details.\n'
+#c.InteractiveShell.banner1 = 'Python 2.7.17 (default, Jan 19 2020, 19:54:54) \nType "copyright", "credits" or "license" for more information.\n\nIPython 5.8.0 -- An enhanced Interactive Python.\n?         -> Introduction and overview of IPython\'s features.\n%quickref -> Quick reference.\nhelp      -> Python\'s own help system.\nobject?   -> Details about \'object\', use \'object??\' for extra details.\n'
 
 ## The part of the banner to be printed after the profile
 #c.InteractiveShell.banner2 = ''
@@ -184,7 +184,7 @@ c.TerminalIPythonApp.force_interact = True
 #c.InteractiveShell.color_info = True
 
 ## Set the color scheme (NoColor, Neutral, Linux, or LightBG).
-c.InteractiveShell.colors = 'Linux'
+#c.InteractiveShell.colors = 'Linux'
 
 ## 
 #c.InteractiveShell.debug = False
@@ -199,7 +199,7 @@ c.InteractiveShell.colors = 'Linux'
 #  forces a full reload of modules whose code may have changed, which the default
 #  reload() function does not.  When deep_reload is off, IPython will use the
 #  normal reload(), but deep_reload will still be available as dreload().
-c.InteractiveShell.deep_reload = True
+#c.InteractiveShell.deep_reload = False
 
 ## Don't call post-execute functions that have failed in the past.
 #c.InteractiveShell.disable_failing_post_execute = False
@@ -297,7 +297,7 @@ c.TerminalInteractiveShell.confirm_exit = False
 c.TerminalInteractiveShell.editing_mode = 'vi'
 
 ## Set the editor used by IPython (default to $EDITOR/vi/notepad).
-c.TerminalInteractiveShell.editor = u'vim'
+#c.TerminalInteractiveShell.editor = u'vim'
 
 ## Enable vi (v) or Emacs (C-X C-E) shortcuts to open an external editor. This is
 #  in addition to the F2 binding, which is always enabled.
@@ -306,9 +306,8 @@ c.TerminalInteractiveShell.extra_open_editor_shortcuts = True
 ## Highlight matching brackets.
 #c.TerminalInteractiveShell.highlight_matching_brackets = True
 
-## The name or class of a Pygments style to use for syntax
-#         highlighting: 
-#  manni, igor, lovelace, xcode, vim, autumn, abap, vs, rrt, native, perldoc, borland, arduino, tango, emacs, friendly, monokai, paraiso-dark, colorful, murphy, bw, pastie, rainbow_dash, algol_nu, paraiso-light, trac, default, algol, fruity
+## The name or class of a Pygments style to use for syntax highlighting. To see
+#  available styles, run `pygmentize -L styles`.
 #c.TerminalInteractiveShell.highlighting_style = traitlets.Undefined
 
 ## Override highlighting format for specific tokens

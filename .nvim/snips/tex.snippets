@@ -1,5 +1,3 @@
-priority -50
-
 # global python functions {{{1
 global !p
 def _parensHelper(s): # {{{
@@ -33,9 +31,15 @@ def _alignHelper(s):  # {{{
 endglobal
 #---------------------------------------------------------------------------}}}1
 
-# inline math {{{1
-snippet "\$+" "$ ... $" wr
+snippet ... "dots" iA
+ \dots 
+endsnippet
+
+snippet $ "$ ... $" i
 \$${VISUAL}${1}\$
+endsnippet
+snippet $$ "$ ... $" iA
+\$${1:${VISUAL}}\$
 endsnippet
 
 snippet "\\fra?c?" "\frac{...}{...}" wr
@@ -46,14 +50,20 @@ snippet "\(+" "\left_ ... \right_" wr
 \\${1:left}${2:(} ${VISUAL}${3} \\`!p snip.rv=_parensHelper(t)`
 endsnippet
 
-snippet "\^\^?" "^{...}" ir
+snippet ^ "^{...}" i
+^{${VISUAL}${1}}
+endsnippet
+snippet ^^ "^{...}" iA
 ^{${VISUAL}${1}}
 endsnippet
 
-snippet "__?" "_{...}" ir
+snippet _ "_{...}" i
 _{${VISUAL}${1}}
 endsnippet
-#---------------------------------------------------------------------------}}}1
+snippet __ "_{...}" iA
+_{${VISUAL}${1}}
+endsnippet
+
 # environments {{{1
 snippet \[ "\[ ... \]" b
 \[
@@ -112,17 +122,29 @@ endsnippet
 #---------------------------------------------------------------------------}}}1
 
 # quantum {{{1
-snippet "\|([^ |>]+)>?" "\ket{ ... }" ir
-\ket{`!p snip.rv = match.group(1)`${VISUAL}}
+priority -1
+
+snippet |> "\ket{ ... }" i
+\ket{${VISUAL}${1}}
+endsnippet
+snippet "\|([^|<>]+)>" "\ket{ ... }" ir
+\ket{`!p snip.rv = match.group(1)`}
+endsnippet
+snippet "\|([^|<>]+)" "\ket{ ... }" ir
+\ket{`!p snip.rv = match.group(1)`${1}}
 endsnippet
 
-snippet "<([^ |>]+)\|?" "\bra{ ... }" ir
-\bra{`!p snip.rv = match.group(1)`${VISUAL}}
+snippet <| "\bra{ ... }" i
+\bra{${VISUAL}${1}}
 endsnippet
-#----------------------------------------------------------------------------}}}1
+snippet "<([^|<>]+)\|" "\bra{ ... }" ir
+\bra{`!p snip.rv = match.group(1)`}
+endsnippet
+snippet "<([^|<>]+)" "\bra{ ... }" ir
+\bra{`!p snip.rv = match.group(1)`${1}}
+endsnippet
 
-# algorithms {{{1
-snippet ";(;|\$)" ";$ ... $;" ir
-;\$${VISUAL}${1}\$;
+snippet <> "\bracket" i
+\bracket{${1}}{${2}}
 endsnippet
 #----------------------------------------------------------------------------}}}1

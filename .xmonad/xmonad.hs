@@ -1,4 +1,3 @@
--- Options
 -- Imports {{{
 import System.Exit
 import Data.Char
@@ -69,8 +68,6 @@ myKeys conf =
   , ("M-z n", removeEmptyWorkspaceAfter $ addWorkspacePrompt myXPConfigWSNew)
   , ("M-l", removeEmptyWorkspaceAfter $ namedScratchpadAction scratchpads "desktop-goto")
   , ("M-z l", removeEmptyWorkspaceAfter $ namedScratchpadAction scratchpads "desktop-goto")
-  --, ("M-l", removeEmptyWorkspaceAfter $ selectWorkspace myXPConfigWSSelect)
-  --, ("M-z l", removeEmptyWorkspaceAfter $ selectWorkspace myXPConfigWSSelect)
   -- send a window to a workspace
   , ("M-M1-l", withWorkspace myXPConfigWSSelect (windows . W.shift))
   , ("M-z M1-l", withWorkspace myXPConfigWSSelect (windows . W.shift))
@@ -200,6 +197,10 @@ toggleFloatAllWS windowId = do
   else do
     windows $ W.float windowId (W.RationalRect 0.025 0.025 0.75 0.75)
     windows copyToAll
+
+-- do float and put on all workspaces
+doCopyToAll = ask >>= doF . \w -> (\ws -> copyToAll ws)
+doCenterFloatToAll = doCenterFloat <+> doCopyToAll
 
 -- floating presets ( left, top, wide, tall (all in %) )
 centerFloat = (customFloating $ W.RationalRect 0.333 0.333 0.333 0.333)
@@ -340,9 +341,11 @@ myStartupHook = do
   checkKeymap xmonadConfig (myKeys xmonadConfig)
 
 myManageHook = myFloats <+> namedScratchpadManageHook scratchpads
+
 myFloats = composeOne [ isDialog -?> doFloat
                       , appName =? "xmessage" -?> centerFloat
                       , className =? "float-term" -?> doCenterFloat
+                      , className =? "float-term-all" -?> doCenterFloatToAll
                       , className =? "transient-term" -?> doCenterFloat ]
 
 -- Display the names of the workspaces, output it to a string, and then write
@@ -356,6 +359,6 @@ scratchpads =
   , NS "vim" "~/.xmonad/SP-vim" (appName =? "SP-vim") botRightFloat
   , NS "desktop-goto" "transient-term desktop-goto" (appName =? "desktop-goto") doCenterFloat
   , NS "launcher" "transient-term fzf-launcher" (appName =? "fzf-launcher") doCenterFloat
-  , NS "surfraw" "transient-term fzf-surfraw" (appName =? "fzf-surfraw") doCenterFloat
+  , NS "surfraw" "transient-term -g 60x8 fzf-surfraw" (appName =? "fzf-surfraw") doCenterFloat
   , NS "etc" "" isScratch doCenterFloat ]
 -----------------------------------------------------------------------------}}}

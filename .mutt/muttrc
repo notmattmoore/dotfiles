@@ -70,7 +70,8 @@ auto_view text/html                                   # auto display these mime-
 # compose options {{{1
 set editor = 'vim "+/^$/+" -c "noh"'  # use vim, position cursor on first blank line
 set sendmail = "/usr/bin/msmtp"        # send mail with msmtp
-set query_command="goobook query '%s'" # use goobook for address lookup
+# use goobook together with a local file for address lookup
+set query_command="goobook query '%s'; head -n -2 ~/.mutt/aliases | grep -i '%s'"
 set use_envelope_from = yes   # make mutt add -f to sendmail so it sends from the right account
 set edit_headers = yes        # edit headers during composition
 set reverse_name = yes        # reply with the address used in the TO/CC header
@@ -118,23 +119,28 @@ folder-hook "+KU/.*" 'source "$HOME/.mutt/muttrc_KU"'
 folder-hook "+KU/INBOX" 'macro index,pager I "<change-folder>+a91738246/INBOX<Enter>" "change folder to +a91738246/INBOX"'
 #----------------------------------------------------------------------------}}}1
 # key bindings and macros {{{1
-macro index,pager s <save-message>? "save message/attachment to a mailbox/file"
-macro index,pager C <copy-message>? "copy a message to a file/mailbox"
+# overrides
+bind index,pager j next-entry       # don't skip deleted messages
+bind index,pager k previous-entry   # ""
+
 bind editor <Tab> complete-query              # tab completion of addresses
 bind index <Backspace> collapse-thread        # use backspace to collapse a thread
 bind index,pager <Space> next-new-then-unread # space goes to next new mail
 bind index U untag-pattern                    # untag according to pattern 
-
+# save and copy
+macro index,pager s <save-message>? "save message/attachment to a mailbox/file"
+macro index,pager C <copy-message>? "copy a message to a file/mailbox"
+# archive message
+macro index,pager A "<save-message>+archival/INBOX<Enter>" "move message to archival INBOX"
 # change to default inbox
 macro index,pager i "<change-folder>+notmattmoore/INBOX<Enter>" "change folder to +notmattmoore/INBOX"
 macro index,pager I "<change-folder>+notmattmoore/INBOX<Enter>" "change folder to +notmattmoore/INBOX"
-# archive message
-macro index,pager A "<save-message>+archival/INBOX<Enter>" "move message to archival INBOX"
+
 # check mail
 macro index,pager <Esc>m "!mbsync -a<enter>" "run mbsync for all accounts"
 
 # open a copy of the message in vim
-macro index,pager \Co "<pipe-message> vim \"+/^$/+\" -c \"set ft=mail\" -<Enter>" "edit message in a floating vim window"
+macro index,pager \Co "<pipe-message> vim \"+/^$/+\" -c \"set ft=mail\" -<Enter>" "open message in vim"
 
 # search using notmuch
 macro index S "<enter-command>unset wait_key<Enter><shell-escape>\

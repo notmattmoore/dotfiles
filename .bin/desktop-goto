@@ -4,7 +4,10 @@
 fifo_name="/tmp/$(basename "$0")_${USER}"
 
 while true; do
-  desktop_name="$(wmctrl -d | awk '{print $9}' | simple-filter --prompt 'Desktop: ')"
+  desktop_name="$(wmctrl -d \
+    | awk '{print $9}' \
+    | grep -Fv 'NSP' \
+    | simple-filter --prompt 'Desktop: ')"
 
   [ -n "$desktop_name" ] \
     && wmctrl -s $(wmctrl -d | grep -m 1 "\<$desktop_name$" | awk '{print $1}')

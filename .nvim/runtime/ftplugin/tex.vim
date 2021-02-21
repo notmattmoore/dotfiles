@@ -1,9 +1,12 @@
 " Place this file in .vim/ftplugin to get sourced while the filetype plugin
-" loads. If we override some LatexBox settings, also place a symlink in
+" loads. If we override some plugin settings, also place a symlink in
 " .vim/after/ftplugin.
 
 " general vim settings {{{1
 setlocal spell              " turn on spell checking
+
+" use deoplete for completions
+call deoplete#custom#var('omni', 'input_patterns', {'tex': g:vimtex#re#deoplete})
 "----------------------------------------------------------------------------}}}1
 " mappings {{{1
 " all mappings are of the form `...
@@ -37,12 +40,6 @@ inoremap <buffer> `v \join
 inoremap <buffer> `^ \wedge
 inoremap <buffer> `6 \partial
 "----------------------------------------------------------------------------}}}
-"----------------------------------------------------------------------------}}}1
-" latex-box {{{1
-imap <buffer> ]] <Plug>LatexCloseCurEnv
-
-let g:LatexBox_viewer = "zathura"
-let g:LatexBox_quickfix = 2   " quickfix window doesn't steal focus
 "----------------------------------------------------------------------------}}}1
 " tagbar {{{1
 " make tagbar work with tex and bib files (also need to add stuff to ~/.ctags)

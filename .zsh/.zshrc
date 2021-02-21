@@ -3,7 +3,7 @@ export PATH="$PATH:$HOME/.bin"  # add ~/.bin to the path
 export ZDOTDIR="$HOME/.zsh"     # set the zsh dot directory
 export LC_ALL="C.UTF-8"
 export EDITOR="vim"
-export BROWSER="google-chrome"
+export BROWSER="firefox"
 export PDFVIEWER="zathura"
 export GPG_TTY="$(tty)"                       # the tty used by gpg
 export _JAVA_AWT_WM_NONREPARENTING=1          # Java programs don't run nicely without this
@@ -59,30 +59,32 @@ PROMPT="${PR_LEFT_CHAR}${PR_USER}${PR_HOST}${PR_PWD_STYLE}%~${PR_RESET_STYLE}${P
 #----------------------------------------------------------------------------}}}
 # History settings {{{
 HISTFILE="${ZDOTDIR}/zsh_history"
-HISTSIZE=500500   # number of lines available in a session (must be >=SAVEHIST)
+HISTSIZE=500000   # number of lines available in a session (must be >=SAVEHIST)
 SAVEHIST=500000   # number of lines saved
-setopt hist_find_no_dups  # don't match duped lines when giving history
-setopt hist_ignore_space  # don't add lines starting with a ' ' to history
-setopt extended_history   # save timestamp and duration information too
-setopt share_history      # make history work with sessions
-setopt hist_expire_dups_first hist_reduce_blanks    # clean up history file
+setopt hist_find_no_dups   # don't match duped lines when giving history
+setopt hist_ignore_space   # don't add lines starting with a ' ' to history
+setopt extended_history    # save timestamp and duration information too
+setopt share_history       # make history work with sessions
+setopt hist_reduce_blanks  # clean up history file
 #----------------------------------------------------------------------------}}}
 # Options {{{
+# misc
+setopt auto_pushd       # automatically use the dir stack
 setopt extended_glob    # extra search patterns
+setopt no_beep          # no beeping FFS
 
+# completions
+setopt correct          # correct spelling (use prompt below)
+SPROMPT="Correct to %{$terminfo[bold]%}%r${PR_RESET_STYLE}? [ynae] "
+setopt list_packed      # make completion list smaller
+setopt no_nomatch       # don't error if no matches are found
+
+# job control
 export REPORTTIME=30    # if command took more than 30s, say how long it took
-setopt no_hup           # dont hangup jobs
 setopt auto_continue    # background jobs are not killed
 setopt no_bg_nice       # dont nice background jobs
 setopt no_check_jobs    # dont bug me about backgrounded jobs
-
-DIRSTACKSIZE=10         # how many directories to keep in the stack
-setopt auto_pushd       # automatically use the dir stack
-
-setopt no_beep          # no beeping FFS
-
-setopt correct          # correct spelling (use prompt below)
-SPROMPT="Correct to %{$terminfo[bold]%}%r${PR_RESET_STYLE}? [ynae] "
+setopt no_hup           # dont hangup jobs
 #----------------------------------------------------------------------------}}}
 # Key bindings {{{
 bindkey -v          # vim keybindings
@@ -90,6 +92,7 @@ bindkey -v          # vim keybindings
 # a widget to indicate which mode we are in on the prompt
 function zle-line-init zle-keymap-select {
   RPROMPT="${${KEYMAP/vicmd/[CMD]}/(main|viins)/}"
+  RPROMPT2=$RPROMPT
   zle reset-prompt
 }
 zle -N zle-line-init
@@ -236,19 +239,23 @@ alias zathura="zathura --fork"
 # custom commands
 alias history="fc -i -n -l 1 -1"    # show full history
 alias onlyx="startx & vlock"
-alias pdflatexmk="latexmk -gg -pdf -pvc -silent"
+alias pdflatexmk="latexmk -pvc -f -silent -pdflatex -synctex=1"
 alias rsend="rsync -ahz --partial --info=progress2"
 alias vess="vim -c 'set number' -"
 alias vnice="nice -n 20 ionice -c 3"
 function vman() { vim <(man $1); }
 alias git-dotfiles="git --git-dir=$HOME/.git-dotfiles"
+
+# file shortcuts
+alias accounts.gpg="vim-gpg ~/personal/accounts.gpg"
+alias ident-notes.gpg="vim-gpg ~/personal/identity/notes.gpg"
+alias logins.gpg="vim-gpg ~/technical/logins.gpg"
 #----------------------------------------------------------------------------}}}
 # Completion {{{
 # cache completions
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path "${ZDOTDIR}/zsh_cache"
-# complete using (in order) expansion, usual completion, ignored patterns, and
-# then approximate
+# complete using (in order) expansion, usual completion, ignored patterns, and then approximate
 zstyle ':completion:*' completer _expand _complete _ignored _approximate
 # if there is an unambiguous match, then insert it
 zstyle ':completion:*:approximate:*' insert-unambiguous true
@@ -256,7 +263,7 @@ zstyle ':completion:*:approximate:*' insert-unambiguous true
 zstyle ':completion:*:approximate:*' max-errors 'reply=( $(( ($#PREFIX+$#SUFFIX)/3 )) )'
 # order the list case insensitively
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}'
-# dont' do completion for not installed commands
+# don't do completion for not installed commands
 zstyle ':completion:*:functions' ignored-patterns '_*'
 
 # color completions like ls
@@ -292,14 +299,14 @@ fi
 
 # put the current working directory or the current program in the title bar
 precmd () {
-  case ${TERM} in
-    screen*) print -Pn "\ek%1~\e\\" ;;
+  case $TERM in
+    tmux*|screen*) print -Pn "\ek%1~\e\\" ;;
     *) print -Pn "\e]0;%~\a" ;;
   esac
 }
 preexec () {
-  case ${TERM} in
-    screen*) print -n "\ek${1}\e\\" ;;
+  case $TERM in
+    tmux*|screen*) print -n "\ek${1}\e\\" ;;
     *) print -n "\e]0;${1}\a" ;;
   esac
 }

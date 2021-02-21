@@ -1,12 +1,30 @@
 #!/bin/sh
-# Usage: float-term [-g <geometry>] <script> [args]
+# Usage: float-term [-a|--all] [-g <geometry>] <script> [args]
 # The script must be in the PATH or be full.
 
+classname="float-term"
 geometry="80x12"
-if [ "$1" = "-g" ]; then
-  geometry=$2
-  shift; shift
-fi
+
+usage() { # {{{
+cat <<EOF
+Usage: $(basename $0) [-a|--all] [-g <geometry>] <script> [args]
+EOF
+} # }}}
+
+# read options
+while [ $# -gt 0 ]; do
+  case "$1" in
+    "-g")         shift && geometry=$1 ;;
+    "-a"|"--all") classname="float-term-all" ;;
+    *)            break ;;
+  esac
+  shift
+done
+
+# get $DISPLAY if we have to
+display=$DISPLAY
+[ -z $display ] && display="$(ps --no-headers -f -C xinit | egrep "^$USER" | egrep -m 1 -wo ":[0-9]+")"
+
 script_name=$( basename "$1" )
 
-st -c "float-term" -n "$script_name" -t "$script_name" -g $geometry -e "$@" 2>/dev/null
+DISPLAY=$display st -c "$classname" -n "$script_name" -t "$script_name" -g $geometry -e "$@" 2>/dev/null

@@ -4,7 +4,7 @@
 #
 # Usage: auto-suspend <temperature> <battery level>
 
-default_temp_threshold=90
+default_temp_threshold=95
 default_bat_threshold=10
 suspend_command="sudo systemctl suspend"
 

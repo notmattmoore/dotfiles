@@ -11,19 +11,6 @@ else
   call plug#begin('~/.vim/vim-plug')
 endif
 
-" ALE for linting
-" \a        activate ALE
-" [a, ]a    prev/next ALE error
-" \A        give detailed error message
-Plug 'w0rp/ale', {'on': 'ALEToggle'}
-let g:ale_enabled = 0                     " disabled by default
-let g:ale_open_list = 1                   " open up the location list window
-let g:ale_lint_on_text_changed = 'never'  " don't auto-update
-nnoremap <leader>a :ALEToggle<CR>
-nmap [a <Plug>(ale_previous_wrap)
-nmap ]a <Plug>(ale_next_wrap)
-nmap <leader>A <PLug>(ale_detail)
-
 " bufexplorer for navigating buffers
 " \b    open bufexplorer
 Plug 'jlanzarotta/bufexplorer'
@@ -33,27 +20,38 @@ let g:bufExplorerShowRelativePath = 1           " show relative paths
 let g:bufExplorerSortBy = 'mru'                 " sort most recently used
 nnoremap <leader>b :ToggleBufExplorer<CR>
 
-" deoplete for completions (nvim only)
-" <C-n>   trigger autocompletion
-if has('nvim')
+" commentary for easy commenting
+" gc{motion}  comment lines that motion moves over
+" gcc         comment lines
+Plug 'tpope/vim-commentary'
+
+" deoplete for completions (+jedi for python). Only for neovim.
+" <C-n>, <C-space>   trigger autocompletion
+" extra settings after plug#end() below
+if has("nvim")
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+  Plug 'deoplete-plugins/deoplete-jedi'   " use jedi for python
   let g:deoplete#enable_at_startup = 1
-  let g:deoplete#auto_complete_delay = 250
-  inoremap <silent><expr> <C-n> deoplete#manual_complete()
-  Plug 'zchee/deoplete-jedi'    " use jedi for python
+  " Use <c-space> to trigger completion (only works for nvim, use <C-@> for vim)
+  inoremap <silent><expr> <C-space> pumvisible() ? "\<C-n>" : <SID>check_back_space() ? "\<C-n>" : deoplete#manual_complete()
+  inoremap <silent><expr> <C-n> pumvisible() ? "\<C-n>" : <SID>check_back_space() ? "\<C-n>" : deoplete#manual_complete()
+  function! s:check_back_space() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~ '\s'
+  endfunction
 endif
 
 " EasyTemplates
 " <C-j>, <C-k>   select next/prev <+...+>
-let g:EasyTemplates_JumpForwardTrigger = "<C-j>"
-let g:EasyTemplates_JumpBackwardTrigger = "<C-k>"
+let g:EasyTemplates_JumpForwardTrigger = '<C-j>'
+let g:EasyTemplates_JumpBackwardTrigger = '<C-k>'
 
 " fugitive for git integration
 " \gs, \gc, \gm    interactive git status/commit/merge
 " \gr, \gS         git rebase, stash
 " \gg              git command line interface
 " :Gw   write and stage file
-Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-fugitive', {'on': ['Gstatus', 'Gmerge', 'Grebase', 'Git']}
 nnoremap <leader>gs :Gstatus<CR>
 nnoremap <leader>gm :Gmerge <Tab>
 nnoremap <leader>gr :Grebase master
@@ -67,7 +65,7 @@ nnoremap <leader>gS :Git stash
 " <C-F1>, <C-s>  use fzf to search vim help, snippets
 Plug 'junegunn/fzf.vim'
 let g:fzf_layout = { 'down': '~33%' }   " fzf window in the bottom 1/3
-let $FZF_DEFAULT_OPTS = "--inline-info --cycle --bind=tab:down,shift-tab:up,alt-enter:print-query,ctrl-space:replace-query,right:replace-query"
+let $FZF_DEFAULT_OPTS = '--inline-info --cycle --bind=tab:down,shift-tab:up,alt-enter:print-query,ctrl-space:replace-query,right:replace-query'
 nnoremap <C-f> :Files<CR>
 nnoremap <C-b> :Buffers<CR>
 nnoremap <C-_> :BLines<CR>
@@ -81,15 +79,6 @@ map / <Plug>(incsearch-forward)
 map ? <Plug>(incsearch-backward)
 map g/ <Plug>(incsearch-stay)
 
-" LaTeX-Box
-Plug 'LaTeX-Box-Team/LaTeX-Box'
-let g:tex_flavor = "latex"    " a .tex file is a latex file
-let g:tex_conceal = ""        " don't use conceal mode to change characters!
-" has to be set *before* tex files are loaded!
-let g:LatexBox_ignore_warnings =
-      \ [ 'Package hyperref Warning'
-      \ , 'Class amsart Warning: When the draft option is used' ]
-
 " mundo to visualize the undo tree
 " \u    open the undotree
 Plug 'simnalamburt/vim-mundo'
@@ -100,7 +89,7 @@ let g:mundo_width = 30           " make sidebar 30 wide
 nnoremap <leader>u :MundoToggle<CR>
 
 " netrw (already loaded)
-let g:netrw_browsex_viewer="google-chrome"
+let g:netrw_browsex_viewer='firefox'
 
 " repeat for repeating plugin actions
 Plug 'tpope/vim-repeat'
@@ -141,15 +130,12 @@ Plug 'tpope/vim-surround'
 
 " tabular for automatically aligning things into a table.
 " \t    tabularize, prompting for delimiter
-" \T    tabularize, reuse previous delimiter
 Plug 'godlygeek/tabular'
 nnoremap <leader>t :Tabularize /
-nnoremap <leader>T :Tabularize<CR>
 vnoremap <leader>t :Tabularize /
-vnoremap <leader>T :Tabularize<CR>
 
 " tagbar for showing the tags in a sidebar
-" \n    open tagbar ("navigate")
+" \n    open tagbar ('navigate')
 Plug 'majutsushi/tagbar', {'on': ['TagbarToggle']}
 let g:tagbar_compact = 1    " make the sidebar more compact
 let g:tagbar_autoclose = 1  " close after selecting a tag
@@ -161,17 +147,23 @@ nnoremap <leader>n :TagbarToggle<CR>
 " <C-j>, <C-k>    go to next position in the snippet
 " \S              edit the relevant snips file
 Plug 'SirVer/ultisnips'
-" use a different snippets directory
-let g:UltiSnipsSnippetsDir = "~/.nvim/snips/"
-let g:UltiSnipsSnippetDirectories = ["snips"]
+" Use snippet directory name 'snips'. Also include local snips.
+let g:UltiSnipsSnippetDirectories = ['snips', getcwd().'/snips', getcwd().'/../snips']
 " ultisnips trigger keys
-let g:UltiSnipsExpandTrigger = "<Tab>"
-let g:UltiSnipsListSnippets = "<S-Tab>"
-let g:UltiSnipsJumpForwardTrigger = "<C-j>"
-let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
+let g:UltiSnipsExpandTrigger = '<Tab>'
+let g:UltiSnipsListSnippets = '<S-Tab>'
+let g:UltiSnipsJumpForwardTrigger = '<C-j>'
+let g:UltiSnipsJumpBackwardTrigger = '<C-k>'
 nnoremap <leader>S :UltiSnipsEdit!<CR>
-let g:UltiSnipsEditSplit = "context"                 " split the snips edit window contextually
-let g:UltiSnipsMappingsToIgnore = ["EasyTemplates"]  " don't mess with Easy Templates select-mode maps!
+let g:UltiSnipsMappingsToIgnore = ['EasyTemplates']  " don't mess with Easy Templates select-mode maps!
+
+" vimtex for latex support
+Plug 'lervag/vimtex'
+let g:tex_flavor = 'latex'                              " a .tex file is a latex file
+let g:vimtex_view_method = 'zathura'                    " use zathura to view pdfs
+let g:vimtex_compiler_latexmk = { 'continuous': 0 }     " disable continuous compilation
+let g:vimtex_quickfix_mode = 2                          " quickfix window doesn't steal focus
+let g:tex_conceal = ''                                  " don't use conceal mode to change characters!
 
 " zenburn color scheme
 Plug 'jnurmine/Zenburn'
@@ -186,14 +178,6 @@ let g:zenburn_unified_CursorColumn = 1  " make the cursorcolumn fit in
 "let g:clever_f_smart_case = 1                " use smartcase
 ""let g:clever_f_timeout_ms = 2000             " timeout after 500ms
 
-"" CtrlP
-"" <C-p>   search for and open buffers, files, and MRU
-"Plug 'ctrlpvim/ctrlp.vim'
-"let g:ctrlp_map = '<C-p>'             " default mapping
-"let g:ctrlp_cmd = 'CtrlPMixed'        " search over buffers, files, and MRU
-"let g:ctrlp_extensions = ['mixed']    " enable 'mixed' extension
-"let g:ctrlp_by_filename = 1           " match on filename insead of path
-
 "" gundo to visualize the undo tree
 "" \u    open the undotree
 "Plug 'sjl/gundo.vim', {'on': 'GundoToggle'}
@@ -204,17 +188,21 @@ let g:zenburn_unified_CursorColumn = 1  " make the cursorcolumn fit in
 "let g:gundo_width = 30           " make sidebar 30 wide
 "nnoremap <leader>u :GundoToggle<CR>
 
+"" LaTeX-Box
+"Plug 'LaTeX-Box-Team/LaTeX-Box'
+"let g:tex_flavor = 'latex'    " a .tex file is a latex file
+"let g:tex_conceal = ''        " don't use conceal mode to change characters!
+"" has to be set *before* tex files are loaded!
+"let g:LatexBox_ignore_warnings =
+"      \ [ 'Package hyperref Warning'
+"      \ , 'Class amsart Warning: When the draft option is used' ]
+"" In ftplugin/tex.vim:
+"imap <buffer> ]] <Plug>LatexCloseCurEnv
+"let g:LatexBox_viewer = 'zathura'
+"let g:LatexBox_quickfix = 2   " quickfix window doesn't steal focus
+
 "" unimpaired (handy pairs of bracket maps)
 "Plug 'tpope/vim-unimpaired'
-
-"" YouCompleteMe for autocompletion
-"" \gg, \gd    go to the definition or documentation of something
-"Plug '/usr/share/vim-youcompleteme'
-"nnoremap <leader>gg :YcmCompleter GoTo<CR>
-"nnoremap <leader>gd :YcmCompleter GoTo<CR>
-"let g:ycm_key_invoke_completion = ""
-"let g:ycm_key_list_select_completion = ['<C-n>']
-"let g:ycm_key_list_previous_completion = ['<C-p>']
 
 "" old search settings
 "set incsearch                 " incremental search
@@ -223,6 +211,11 @@ let g:zenburn_unified_CursorColumn = 1  " make the cursorcolumn fit in
 "cnoremap %s/ %s/\v
 "----------------------------------------------------------------------------}}}
 call plug#end()
+
+
+" calls after plug#end() {{{2
+call deoplete#custom#option({'auto_complete': v:false })
+"----------------------------------------------------------------------------}}}2
 "---------------------------------------------------------------------------}}}1
 " status line {{{1
 set statusline=%t                     " <tail of the filename>
@@ -241,6 +234,9 @@ function! MyGitStatusLine(...) abort
 endfunction
 "---------------------------------------------------------------------------}}}1
 " interface settings {{{1
+set termguicolors                 " use 24bit colors
+let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"  " black magic: vim-specific RGB colors
+let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"  " black magic: vim-specific RGB colors
 colorscheme zenburn               " use zenburn
 set belloff=all                   " don't ring the bell!
 set clipboard=unnamedplus         " use the clipboard (Ctrl-C) by default
@@ -264,7 +260,7 @@ set splitright                    " open new vsplits to the right
 set nostartofline                 " try to keep the curson in the same column
 set termguicolors                 " nice colors in the terminal
 set virtualedit=block             " allow moving past EOL in visual block
-set wildcharm=<Tab>
+set wildcharm=<Tab>               " tab triggers wildmode
 set wildmode=longest:full         " on first tab, match longest common string and show menu
 set wildmode+=full                " on second tab, cycle full matches
 "---------------------------------------------------------------------------}}}1
@@ -301,7 +297,7 @@ augroup all
 autocmd!
 " When editing a file, jump to the last cursor position.
 autocmd BufReadPost *
-  \ if line("'\"") > 1 && line("'\"") <= line("$") |
+  \ if line("'\"") > 1 && line("'\"") <= line('$') |
   \   execute "normal! g`\"" |
   \ endif
 augroup END
@@ -330,10 +326,6 @@ noremap - <C-x>
 " mappings {{{
 " make 'jk' go into normal mode
 inoremap jk <Esc>
-" use \d<movement> to delete without adding to the register
-nnoremap <leader>d "_d
-vnoremap <leader>d "_d
-nnoremap <leader>D "_D
 " use space to expand and create folds
 nnoremap <space> za
 vnoremap <space> zf
@@ -344,6 +336,10 @@ nnoremap [b :bprev<CR>
 nnoremap <C-l> :nohlsearch<CR><C-l>
 " quickly turn on/off spell checking
 nnoremap <leader>s :setlocal spell!<CR>
+" use \d<movement> to delete without adding to the register
+nnoremap <leader>d "_d
+vnoremap <leader>d "_d
+nnoremap <leader>D "_D
 "----------------------------------------------------------------------------}}}
 "---------------------------------------------------------------------------}}}1
 

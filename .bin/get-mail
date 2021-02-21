@@ -1,10 +1,23 @@
 #!/bin/sh
-# synchronize mail using mbsync and do other associated tasks
+# Synchronize mail using mbsync and do other associated tasks
 
 update_interval="5m"
+mail_dir="$HOME/.mail"
+sieve_dir="$HOME/.binrc/sieve-scripts"
+
+sieve_scripts() { # {{{
+  echo "Sieving..."
+
+  sieve -f "$mail_dir/notmattmoore/[Gmail].Sent Mail" -- "$sieve_dir/sent-mail"
+  sieve -f "$mail_dir/a91738246/[Gmail].Sent Mail"    -- "$sieve_dir/sent-mail"
+  sieve -f "$mail_dir/KU/Sent Items"                  -- "$sieve_dir/sent-mail"
+  sieve -f "$mail_dir/KU/Sent"                        -- "$sieve_dir/move-to-inbox"
+  sieve -f "$mail_dir/KU/INBOX"                       -- "$sieve_dir/teach_submissions"
+} # }}}
 
 while true; do
   mbsync -a
+  sieve_scripts
   notmuch new
   echo "$(date -Is): Sleeping for $update_interval..."
   sleep "$update_interval"

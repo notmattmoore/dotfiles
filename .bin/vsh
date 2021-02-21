@@ -5,7 +5,7 @@
 # Read from standard input, put it in a vim instance, and then execute the
 # results upon exit. Log all things run this way.
 
-vim_cmd='nvim -c "set noswapfile" -c "set noundofile"'
+vim_cmd='vim -c "set noswapfile" -c "set noundofile"'
 script_header='read -q "?Run script? [y/N] " || exit; source $HOME/.binrc/vsh.aliases'
 logsep_top="-$(date -Is)------------------------------------------------------"
 logsep_bot="--------------------------------------------------------------------------------"
