@@ -1,0 +1,79 @@
+#!/bin/sh
+# todo -- To do list manager.
+# Usage: todo [-h|--help] [-p|--print] [-e|--edit] [-a|--add] [item]
+# Version: 2025-06-12
+
+todo_file="$HOME/todo"
+sendmail_cmd="msmtp -a notmattmoore notmattmoore@gmail.com"
+
+usage() {  # {{{
+cat <<EOF
+Usage:$(basename $0) [-h|--help] [-p|--print] [-e|--edit] [-a|--add] [item]
+EOF
+} # }}}
+print_list() {  # {{{
+  # if there are no items, then exit
+  [ ! -s "$todo_file" ] && return
+
+  leader="To do:"
+  line=0
+  ( cat "$todo_file" | while read todo_item; do
+    line=$((line +1))
+    if [ $# -eq 0 ] || ( echo "$todo_item" | grep -i -q "$@" ); then
+      echo "$leader [$line] $todo_item"
+      leader="      "
+    fi
+  done ) | column
+} # }}}
+add() { # {{{
+  echo "$@" >> "$todo_file"
+  send_mail "$@"
+} # }}}
+remove() { # {{{
+  for line in $( echo $@ | tr " " "\n" | sort -nr ); do
+    if ( echo "$line" | grep -Eq "^[0-9]+$" ); then
+      sed "${line}d" "$todo_file" | sponge "$todo_file"
+    else
+      echo "non-integer line number: $line."
+    fi
+  done
+} # }}}
+auto_add_remove(){  # {{{
+  # Check if input is all integers, in which case we remove those lines.
+  # Otherwise we add the input to the todo list
+  if ( echo "$@" | grep -Eq "^([1-9][0-9]* *)*$" ); then
+    remove $@
+  else
+    add $@
+  fi
+}  # }}}
+send_mail() { # {{{
+  echo "Subject: [ToDo] $@\n\n$@" | $sendmail_cmd
+} # }}}
+
+case "$1" in
+  "-h" | "--help")
+    usage && exit 1
+  ;;
+  "-p" | "--print")
+    shift && print_list $@
+  ;;
+  "-a" | "--add")
+    [ $# -eq 1 ] && usage && exit 1
+    shift && add $@
+  ;;
+  "-r" | "--remove")
+    [ $# -eq 1 ] && usage && exit 1
+    shift && remove $@
+  ;;
+  "-e" | "--edit")
+    vim "$todo_file"
+  ;;
+  *)
+    if [ $# -eq 0 ]; then
+      print_list $@
+    else
+      auto_add_remove $@
+    fi
+  ;;
+esac

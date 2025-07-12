@@ -1,0 +1,128 @@
+#!/bin/sh
+# Use fzf to search the web or run commands.
+# Usage: fzf-command [<query>|<command>]
+# NB: quoted searches don't work from the CLI, but do with fzf.
+# Version: 2025-03-15
+
+# defaults
+cmd_browser="firefox -P default -new-window"
+cmd_dictionary="goldendict"
+shortcut_default="yandex "
+shortcuts="yandex 
+  bing 
+  google 
+  images 
+  maps 
+  news 
+  videos 
+  dictionary 
+  wikipedia 
+  youtube 
+  W 
+  R "
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
+  --bind=enter:replace-query+print-query --prompt='Search: '"
+
+command=$@
+[ -z "$command" ] && command=$(echo "$shortcuts" | sed  's/  //' | fzf)
+[ -z "$command" ] && exit   # exit if the query is empty
+
+# engine selection {{{
+unset prefix
+unset postfix
+unset dont_escape
+unset dont_quote
+
+case $(echo $command | cut -d ' ' -f 1) in
+  dictionary)
+    dont_escape=1
+    cmd="$cmd_dictionary"
+    ;;
+  google)
+    prefix="www.google.com/search?q="
+    postfix="&safe=off"
+    cmd="$cmd_browser"
+    ;;
+  images)
+    prefix="yandex.com/images/search?text="
+    cmd="$cmd_browser"
+    ;;
+  maps)
+    prefix="www.google.com/maps?q="
+    postfix="&safe=off"
+    cmd="$cmd_browser"
+    ;;
+  news)
+    prefix="www.google.com/search?tbm=nws&q="
+    postfix="&safe=off"
+    cmd="$cmd_browser"
+    ;;
+  videos)
+    prefix="www.bing.com/videos/search?q="
+    cmd="$cmd_browser"
+    ;;
+  wikipedia)
+    prefix="https://en.wikipedia.org/w/index.php?title=Special&search="
+    cmd="$cmd_browser"
+    ;;
+  youtube)
+    prefix="https://www.youtube.com/results?search_query="
+    cmd="$cmd_browser"
+    ;;
+  yandex)
+    prefix="https://yandex.com/search/?text="
+    cmd="$cmd_browser"
+    ;;
+  W)
+    dont_escape=1
+    cmd="$cmd_browser"
+    ;;
+  *)
+    fzf-command $shortcut_default $command
+    exit
+    ;;
+esac
+#----------------------------------------------------------------------------}}}
+
+escape_query() {  # {{{
+  echo "$@" | sed -e 's/%/%25/g
+                      s/ /%20/g;
+                      s/!/%21/g;
+                      s/"/%22/g;
+                      s/#/%23/g;
+                      s/\$/%24/g;
+                      s/\&/%26/g;
+                      s/(/%28/g;
+                      s/)/%29/g;
+                      s/\*/%2a/g;
+                      s/+/%2b/g;
+                      s/,/%2c/g;
+                      s/-/%2d/g;
+                      s/\./%2e/g;
+                      s/\//%2f/g;
+                      s/:/%3a/g;
+                      s/;/%3b/g;
+                      s//%3e/g;
+                      s/?/%3f/g;
+                      s/@/%40/g;
+                      s/\[/%5b/g;
+                      s/\\/%5c/g;
+                      s/\]/%5d/g;
+                      s/\^/%5e/g;
+                      s/_/%5f/g;
+                      s/`/%60/g;
+                      s/{/%7b/g;
+                      s/|/%7c/g;
+                      s/}/%7d/g;
+                      s/~/%7e/g;
+                      '"s/'/%27/g;"
+} # }}}
+
+# Remove first word in command, escape the resulting query if needed, and run
+# the command
+query=$(echo $command | cut -d ' ' -f 2-)
+[ $dont_escape ] || query=$(escape_query "$query")
+setsid $cmd "$prefix$query$postfix" 1>/dev/null 2>&1 &
+pkill --signal KILL -f "$(which $0)"'$'
+
+# setsid -f $cmd "$prefix$query$postfix" 1>/dev/null 2>&1

@@ -1,0 +1,12 @@
+# variable 'account' must be set on command line
+
+require ["fileinto", "test-pipe"];
+
+if pipe :body "grep -Fqs -m 1 'Sent from my mobile device'" {
+  fileinto "~/.mail/${account}/INBOX";
+}
+else {
+  fileinto "~/.mail/trash";
+}
+
+# vim: set ft=sieve:

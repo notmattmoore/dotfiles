@@ -1,0 +1,11 @@
+#!/bin/sh
+# Check to see if any timers are dead or failed. If they are, then output and
+# exit with error code.
+# Version: 2025-06-12
+
+timers_bad=$(systemctl --user list-timers --all --state=dead --state=failed | tail -n 1 | awk '{print $1}')
+
+[ $timers_bad -ne 0 ] \
+  && systemctl --user list-timers --all --state=dead --state=failed
+
+exit $timers_bad

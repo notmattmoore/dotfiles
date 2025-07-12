@@ -1,0 +1,74 @@
+# variable 'account' must be set on command line
+
+require ["fileinto"];
+
+# it's not spam if we sent it
+if address :contains "from" ["notmattmoore@gmail.com", "a91738246@gmail.com", "mtt.mre@gmail.com"] {
+  stop;
+}
+
+if anyof (
+  # spam addresses {{{
+  header :contains "from" [
+    "@academickeys.com",
+    "@ccsend.com",
+    "@codegrade.com",
+    "@e.maplesoft.com",
+    "@electrical-electronic-jobs.com",
+    "@em.cengage.com",
+    "@goaptive.com",
+    "@hpi-hep.com",
+    "@hypothes.is",
+    "@iceccme.com",
+    "@iclicker.com",
+    "@info.inbox-insider.com",
+    "@kendallhunt.com",
+    "@listserv.acm.org",
+    "@macmillan.com",
+    "@makerbot.com",
+    "@mheducation.com",
+    "@nestarter.com",
+    "@offers.infobase.com",
+    "@outbound.research.net",
+    "@riipen.com",
+    "@sci.scientific-direct.net",
+    "@studica.com",
+    "@ucertify.com",
+    "@ureka.co.uk",
+    "@wiley.com",
+    "@wolfram.com",
+    "@zybooks.com",
+    "a.al-sadoon@westernsydney.edu.au",
+    "acmbulletin@acm.org",
+    "becky.zhang@mdpi.com",
+    "email@email.brooksbrothers.com",
+    "healthquest@cerner.com",
+    "julia@ureka.co.uk",
+    "ksrba@wisewire.com",
+    "noreply-marketplace@zoom.us",
+    "noreply@qemailserver.com",
+    "nsf-update@govdelivery.nsf.gov",
+    "pubs@acm.org",
+    "webmaster@simiode.org",
+  ], # }}}
+  # spam subjects {{{
+  header :contains "subject" [
+    "CTE News",
+    "Facilities Services Alert",
+    "HRM Newsletter",
+    "National Science Foundation Daily Digest Bulletin",
+    "Sale of Examination Copies of Textbooks"
+  ], # }}}
+  # one-off spam {{{
+  # from + subject
+  allof ( header :contains "from" "SEHBP@list.ks.gov", header :contains "subject" "HealthQuest" ),
+  allof ( header :contains "from" "wcalvert@siu.edu", header :contains "subject" "Online Logic Seminar" ),
+
+  # from + to
+  allof ( header :contains "from" ["jlohoefener@ku.edu", "tamezad@ku.edu"], header :contains "to" ["i2s-faculty@ku.edu", "i2s-all@ku.edu"] )
+  # }}}
+) {
+  fileinto "~/.mail/${account}/discard";
+}
+
+# vim: set ft=sieve:

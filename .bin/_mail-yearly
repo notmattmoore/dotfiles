@@ -1,0 +1,10 @@
+#!/bin/zsh
+
+mail_archival_root="$HOME/.mail/archival"
+
+year=$(date '+%Y')
+
+mkdir -p "$mail_archival_root"/$year/{INBOX,purchases}/{cur,new,tmp} \
+  && rm -f "$mail_archival_root"/{INBOX,purchases} \
+  && ln -s "$mail_archival_root"/$year/{INBOX,purchases} "$mail_archival_root"/ \
+  && (echo "Finished setting up archival mail for $year." | tee >(mail -s "$0" mm))

@@ -1,0 +1,12 @@
+# overrrides
+alias cp="cp --reflink=auto -i"
+alias locate="locate --regex"
+alias mkdir="mkdir -p"
+alias rsend="rsync -ahz --partial --info=progress2"
+alias sxiv="sxiv -a -o -s f"
+
+# custom commands
+alias git-dotfiles="git --git-dir=$HOME/.git-dotfiles --work-tree=$HOME"
+alias vess="vim -c 'set number' -"
+alias vnice="nice -n 20 ionice -c 3"
+alias zathura="zathura --fork"

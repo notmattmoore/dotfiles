@@ -1,0 +1,23 @@
+#!/bin/sh
+# output a list of desktops, desktop windows, and tmux windows
+
+# log all output if not run interactively
+[ ! -t 0 ] && exec >> "$HOME/.log/$(basename $0).log" && echo "\n--\n"
+
+# desktops and desktop windows
+for XINIT in "$(ps -ef | egrep ':[0-9]{2} xinit ')"; do
+  export DISPLAY="$(echo "$XINIT" | egrep -m 1 -wo ':[0-9]+')"
+  echo "At $(date +%F\ %T) on display $DISPLAY, X state is..."
+  echo "Desktops:"
+  wmctrl -d | tr -s ' ' | cut -d ' ' -f 1,9- | awk '{print "  "$0}'
+  echo "Windows:"
+  wmctrl -l | tr -s ' ' | cut -d ' ' -f 2,4- | awk '{print "  "$0}'
+done
+
+# tmux windows
+echo "\nAt $(date +%F\ %T), tmux state is..."
+for socket in /tmp/tmux-*/*; do
+  socket="$( basename $socket )"
+  echo "Socket $socket:"
+  tmux -L "$socket" list-windows -a 2>/dev/null | awk '{print "  "$0}'
+done

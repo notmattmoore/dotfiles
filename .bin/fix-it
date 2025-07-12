@@ -1,0 +1,54 @@
+#!/bin/bash
+# fix various devices
+# Usage: fix-it <bluetooth|cellular|mouse>
+
+set -e  # exit on any error
+
+usage() { # {{{
+cat <<EOF
+Usage: fix-it <bluetooth|cellular|mouse>
+EOF
+}  # }}}
+
+# echo and execute
+exe() { echo "  \$ $@" ; eval "$@" ; }
+
+sleep_countdown() { # {{{
+  echo -n "Sleeping for "
+
+  duration=$1
+  shift
+
+  # Save cursor position and make it invisible, use a trap to restore the cursor
+  tput sc && tput civis
+  trap 'tput cnorm > /dev/tty' 0 1 2 3 15
+
+  remaining=$duration
+  while [ $remaining -gt 0 ]; do
+    # Place cursor at saved position, delete from cursor to last column
+    tput rc && tput ed && echo -n "$remaining ..."
+    remaining=$(($remaining-1))
+    sleep 1
+  done
+  tput rc && tput ed && echo "$remaining ..."
+} # }}}
+
+case $1 in
+  "bluetooth")
+    exe sudo systemctl restart bluetooth.service
+  ;;
+  "cellular")
+    exe sudo modprobe -r cdc_mbim
+    exe sudo modprobe cdc_mbim
+    sleep_countdown 15
+    ext sudo systemctl restart ModemManager.service
+  ;;
+  "mouse")
+    exe sudo modprobe -r psmouse
+    exe sudo modprobe psmouse
+    sleep_countdown 5
+    exe sudo systemctl restart gpm.service
+    exe trackpoint-setup
+  ;;
+  *) usage ;;
+esac

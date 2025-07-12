@@ -1,0 +1,57 @@
+#!/bin/sh
+# Usage: transient-term  [-w|--width <width>] [-h|--height <height>] <script> [args]
+# The script must be in the PATH or be full. Uses a named pipe to comminicate
+# with the called script.
+
+name="transient-term"
+geo_width=50
+geo_height=8
+
+# read options
+while [ $# -gt 0 ]; do
+  case "$1" in
+    "-w" | "--width")   shift && geo_width=$1 ;;
+    "-h" | "--height")  shift && geo_height=$1 ;;
+    *)                  break ;;
+  esac
+  shift
+done
+
+script_name="$(basename "$1")"
+script_fullname="$1"; shift; script_args=$@
+fifo="/tmp/${script_name}_${USER}"
+
+# if the window is already open somewhere else, then bring it here and exit
+xdotool search --limit 1 --name "^${script_name}$" set_desktop_for_window $(xdotool get_desktop) \
+  && exit
+
+# Set up the fifo, complain if it already exists.
+if [ -e "$fifo" ]; then
+  zenity --width=400 --error --text "Pipe $fifo already exists\!" >/dev/null 2>&1 &
+  exit 1
+fi
+trap "rm -f \"$fifo\"" EXIT
+mkfifo "$fifo"
+
+# Run the script in a terminal. When the terminal exits, write exit to the fifo
+# so that we can terminate the while loop below. Background all of this.
+(
+  kitty --wait-for-single-instance-window-close --name "$name" --title "$script_name" -o remember_window_size=no -o initial_window_width=${geo_width}c -o initial_window_height=${geo_height}c -- "$script_fullname" $script_args
+  # xterm -name "$name" -title "$script_name" -geometry $geometry -e "$script_fullname" $script_args 2>/dev/null;
+  # eval "$term_cmd" -name "$script_name" -title "$script_name" -geometry $geometry -e "$script_fullname" $script_args 2>/dev/null
+  # st -c "$classname" -n "$script_name" -t "$script_name" -g $geometry -e "$script_fullname" $script_args 2>/dev/null
+  [ -p "$fifo" ] && echo "exit" > "$fifo"
+) &
+
+# Monitor the pipe. If we recieve anything other than 'exit', then return the
+# window to the scratch desktop. If the scratch desktop doesn't exist, then
+# close the window and exit.
+while [ -p "$fifo" -a "$(cat "$fifo")" != "exit" ]; do
+  NSP_number=$( wmctrl -d | grep -m 1 "\<NSP$" | awk '{print $1}' )
+  if [ -n "$NSP_number" ]; then
+    xdotool search --limit 1 --name "^${script_name}$" set_desktop_for_window $NSP_number
+  else
+    xdotool search --limit 1 --name "^${script_name}$" windowclose
+    exit
+  fi
+done

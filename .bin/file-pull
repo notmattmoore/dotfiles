@@ -1,0 +1,131 @@
+#!/bin/zsh
+# Usage: file-pull [-n|--no-conf] [--src <path prefix>] [--dest <path prefix>] task
+# Send files from $src to $dest using rsync. Source the file
+# ~/.binrc/file-pullsync/file-pull_$task.$host for task-specific variables
+# (incl. filter). Allows for editing of the list of files to be transferred.
+#
+# Version: 2023-02-25
+
+# directory configuration files are stored in
+conf_dir="$HOME/.binrc/file-pullsync"
+
+# defaults
+src_default="alpha:$HOME/"
+dest_default="$HOME/"
+rsync_base_default="rsync"
+rsync_opts_default="--archive \
+  --recursive \
+  --hard-links \
+  --one-file-system \
+  --delete \
+  --force \
+  --compress \
+  --human-readable"
+vim_cmd_default="vim -c \"set noswapfile | set noundofile\" --"
+
+# get host-specific settings
+source "$conf_dir/$(basename $0).$(hostname)" 2>/dev/null
+
+script_name="$(basename "$0")"
+
+usage() { # {{{
+cat <<EOF
+$script_name: send files from one location to another using rsync. Allows for
+editing of the list of files to be transferred.
+
+Usage: $script_name <options> task
+
+Default source: $src_default
+Default destination: $dest_default
+
+Options:
+  task                  Source the file $conf_dir/${script_name}_\$task.$(hostname).
+  -n | --no-conf        Don't edit the list of files before transfer
+  --src <path prefix>   Set location 1 (default: $src)
+  --dest <path prefix>  Set location 2 (default: $dest)
+
+Available tasks: $( find "$conf_dir" -name "${script_name}_*.$(hostname)" \
+  | sed -r "s/^.*${script_name}_(.*)\.[^.]+$/\1/" \
+  | tr '\n' ' ' )
+EOF
+}  # }}}
+
+# parse options
+while [ $# -gt 0 ]; do
+  case "$1" in
+    "-n" | "--no-conf")  no_confirm=1       ;;
+    "--src")             shift && src="$1"  ;;
+    "--dest")            shift && dest="$1" ;;
+    *)
+      # get task-specific settings
+      [ ! -f "$conf_dir/${script_name}_$1.$(hostname)" ] && usage && exit 1
+      source "$conf_dir/${script_name}_$1.$(hostname)"
+    ;;
+  esac
+  shift
+done
+
+# Process task-specific variables
+[ -z "$src" ] && src="$src_default"
+[ -z "$dest" ] && dest="$dest_default"
+[ -z "$rsync_base" ] && rsync_base="$rsync_base_default"
+[ -z "$rsync_opts" ] && rsync_opts="$rsync_opts_default"
+rsync_cmd="$rsync_base $rsync_opts"
+[ -z "$vim_cmd" ] && vim_cmd="$vim_cmd_default"
+
+# If using ssh for either src or dest, then set up master mode for this session.
+ssh_master() {  # {{{
+  user_host="$@"
+
+  # If a user is not specified, then use $USER.
+  (echo "$user_host" | grep -Exq ".+@.+") || user_host="${USER}@${1}"
+
+  [ -n "$@" ] && [ ! -S "$HOME/.ssh/master-${user_host}:22" ] && ssh -MNf "$user_host"
+} # }}}
+ssh_master "$(echo "$src" | grep -Eo "^[[:alnum:].@]*")"
+ssh_master "$(echo "$dest" | grep -Eo "^[[:alnum:].@]*")"
+
+# Set up the filter and run the initial rsync command.
+filter_file="$(mktemp "/tmp/$script_name.XXX")" \
+  && files_from="$(mktemp "/tmp/$script_name.XXX")" \
+  && trap "rm $filter_file; rm $files_from; exit" 0 1 2 3 15
+filter > "$filter_file"
+rsync_cmd="$rsync_cmd --filter=\"merge $filter_file\""
+
+bold=$(tput bold)
+normal=$(tput sgr0)
+desc="${bold}Receiving${normal} files from $src. ${bold}Sending${normal} files to $dest."
+[ $no_confirm ] && desc="$desc (${bold}NO CONFIRMATION${normal})"
+echo "$desc"
+
+if [ ! $no_confirm ]; then
+  # Find out which files would be transferred. The first line and last 3 lines
+  # are not relevant, so we delete them. We also filter out directories.
+  modified_file_list="$( \
+    eval "$rsync_cmd" --verbose --dry-run --out-format=%n "$src" "$dest" \
+    | sed '1d' \
+    | head -n -3 \
+    | grep -v '/$' )"
+  echo "# Files to transfer from $src to $dest (empty list cancels).\n$modified_file_list" \
+    > "$files_from"
+  eval "$vim_cmd" "$files_from"
+
+  # strip comments/blank lines from $files_from
+  sed -E '/^\ *(#|$)/d' "$files_from" | sponge "$files_from"
+
+  # if $files_from is empty then exit
+  [ ! -s $files_from ] && exit
+
+  rsync_cmd="$rsync_cmd --files-from=\"$files_from\""
+fi
+
+# prompt the user to do the transfer
+while true; do
+  read "?Transfer files? [Y|n] " P
+  if [ -z "$P" -o "$P" = "y" -o "$P" = "Y" ]; then
+    eval "$rsync_cmd" --info=progress2 "$src" "$dest"
+    break
+  elif [ "$P" = "n" -o "$P" = "N" ]; then
+    break
+  fi
+done

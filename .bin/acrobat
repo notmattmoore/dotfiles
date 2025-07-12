@@ -1,0 +1,7 @@
+#!/bin/sh
+# https://appdb.winehq.org/objectManager.php?sClass=application&iId=847
+
+export WINEPREFIX="$HOME/.wine-acrobat"
+program="$WINEPREFIX/drive_c/Program Files/Adobe/Acrobat Reader DC/Reader/AcroRd32.exe"
+
+wine "$program" $@

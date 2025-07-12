@@ -1,0 +1,31 @@
+#!/bin/sh
+# Set up a LaTeX project using a template file.
+# Usage: latex-project <template name> <project name>
+# Version: 2021-02-23
+
+template_dir="$HOME/academia/templates"
+template_file="$template_dir/$1.tex"
+proj_name="$2"
+
+usage() { # {{{
+cat <<EOF
+Usage: $(basename $0) <template name> <project name>
+Where <template name> is one of
+  $( ls "$template_dir/"*.tex \
+    | sed -r "s/.*\/([^\/]*)\.tex$/\1/" \
+    | grep -v '^0' \
+    | tr '\n' ' ' )
+EOF
+}  # }}}
+
+if [ $# -ne 2 ] || [ ! -f "$template_file" ]; then
+  usage
+  exit 1
+elif [ -e "$proj_name" ]; then
+  echo "Error: $proj_name already exists."
+  exit 1
+fi
+
+mkdir "$proj_name"
+cp "$template_file" "$proj_name/$(basename "$proj_name.tex")"
+echo "Created $1 in $proj_name/"

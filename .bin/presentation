@@ -1,0 +1,65 @@
+#!/bin/sh
+# Usage: presentation on|off
+#
+# Version: 2022-05-04
+
+# prune and buffer the xrandr output for processing
+xrandr_output="$( xrandr \
+  | grep -E '^([^ ]+ (connected|disconnected [0-9x\+]+)|  .*\*)' )"
+
+usage() { # {{{
+cat <<EOF
+Usage: $(basename $0) on|off
+EOF
+}  # }}}
+find_primary_display(){  # {{{
+  # grep $@ and output the display marked as "connected primary"
+  echo "$@" \
+    | grep -E -m 1 "^[^ ]+ connected primary" \
+    | awk '{print $1}'
+}  # }}}
+find_connected_external_display(){  # {{{
+  # grep $@ and output the first connected external display.
+  echo "$@" \
+    | grep -E "^[^ ]+ connected" \
+    | grep -E -v -m 1 "^[^ ]+ connected primary" \
+    | awk '{print $1}'
+}  # }}}
+xrandr_turnoff_disconn() {  # {{{
+  # grep $@ to find displays that are disconnected by still configured, then
+  # echo the xrandr arguments to turn them off
+  echo "$@" \
+    | grep 'disconnected' \
+    | awk '{print "--output " $1 " --off"}' \
+    | tr '\n' ' '
+}  # }}}
+exe() { echo "  \$ $@" ; eval "$@" ; }    # echo and execute
+
+primary_display="$( find_primary_display "$xrandr_output" )"
+
+case "$1" in
+  "on")
+    external_display="$( find_connected_external_display "$xrandr_output" )"
+    if [ -z "$external_display" ]; then
+      echo "No connected external displays found."
+      exit 1
+    fi
+    echo "Turning on $external_display (above $primary_display)."
+    exe xrandr --output "$external_display" --auto --above "$primary_display" \
+      $( xrandr_turnoff_disconn "$xrandr_output" )
+    exe xset s off
+    exe xset -dpms
+    ;;
+  "off")
+    external_display="$( find_connected_external_display "$xrandr_output" )"
+    echo "Turning off $external_display."
+    exe xrandr --output "$primary_display" --auto --output "$external_display" --off \
+      $( xrandr_turnoff_disconn "$xrandr_output" )
+    exe xset s on
+    exe xset +dpms
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac

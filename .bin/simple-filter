@@ -1,0 +1,129 @@
+#!/bin/bash
+# A simple interactive filter reading from stdin
+# Usage: simple-filter [(-p|--prompt) "Query:"] 
+#                      [-r|--read]
+#                      [--query-pre "pre"]
+#                      [--query-sep "sep"]
+#                      [--query-post "post"]
+
+# defaults
+prompt="Query: "
+query_pre="^"
+query_sep=".*?"
+query_post=""
+
+usage() { # {{{
+cat <<EOF
+Usage: simple-filter [(-p|-prompt) "Query: "] 
+                     [-r|--read]
+                     [--query-pre "pre"]
+                     [--query-sep "sep"]
+                     [--query-post "post"]
+EOF
+}  # }}}
+filter_loop() { # {{{
+  # Change to alt screen, clear, and make cursor invisible. We restore the
+  # cursor on exit, but add a trap just in case.
+  trap 'tput cnorm > /dev/tty' 2
+  tput smcup && tput clear && tput civis
+
+  # show the prompt and save the cursor position
+  echo -n "$prompt" && tput sc && echo ""
+  yes "─" | head -$num_cols | tr -d '\n'
+  found="$input"
+  while [ $read_input ] || [ -z "$found" ] || [ $(echo "$found" | wc -l) -ne 1 ]; do
+    # put cursor below prompt and border, clear from cursor to end of screen
+    tput cup 2 0 && tput ed
+    echo "$found" \
+      | grep -P --color=always "$query_pre$query$query_post" \
+      | column -c $num_cols \
+      | head -n $output_lines \
+      | head -c -1    # delete trailing newline!
+    # put cursor after prompt, clear from cursor to end of line
+    tput rc && tput el
+    IFS='' read -s -p "$query_read▉" -n 1 Q < /dev/tty
+
+    # input character parsing {{{
+    # if given non-control character
+    if [ -n "$(echo "$Q" | tr -d [:cntrl:])" ]; then
+      query_read="$query_read$Q"
+      [ -n "$query" ] \
+        && query="$query$query_sep$Q" \
+        || query="$Q"
+    else  # given control character
+      case "$Q" in
+        "")      # enter
+          [ $read_input ] \
+            && found="$query_read" \
+            || found="$(echo "$found" | head -1)"
+          break
+        ;;
+        $'\177') # backspace
+          case ${#query_read} in
+            0) ;;
+            1)
+              unset query_read
+              unset query
+            ;;
+            *)
+              query_read="${query_read::-1}"
+              query="${query::$query_backspace}"
+            ;;
+          esac
+        ;;
+        $'\33')  # escape
+          unset found
+          break
+        ;;
+        *)       # disregard everything else
+          continue
+        ;;
+      esac
+    fi  # }}}
+
+    # do the search
+    found="$(echo "$input" | grep -P "$query_pre$query$query_post")"
+  done
+
+  # restore the terminal
+  tput rmcup && tput cnorm
+}  # }}}
+# argument parsing {{{
+while [ $# -gt 0 ]; do
+  case "$1" in
+    "-p" | "--prompt")
+      shift
+      prompt=$1
+    ;;
+    "-r" | "--read")
+      read_input=1
+    ;;
+    "--query-pre")
+      shift
+      query_pre="$1"
+    ;;
+    "--query-sep")
+      shift
+      query_sep="$1"
+    ;;
+    "--query-post")
+      shift
+      query_post="$1"
+    ;;
+    *) usage && exit ;;
+  esac
+  shift
+done   # }}}
+
+# calculated lengths
+query_backspace=$((-1 - ${#query_sep}))   # how big a backspace is
+num_cols=$(tput cols)
+num_lines=$(tput lines)
+output_lines=$(($num_lines - 2))          # lines to display filtered results in
+
+# get input from stdin
+input="$( < /dev/stdin )"
+
+filter_loop > /dev/tty
+
+echo "$found"

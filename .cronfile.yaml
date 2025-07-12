@@ -1,0 +1,113 @@
+# Be sure to run yaml-to-systemd <file> when this file is modified.
+#
+# Defaults and shortcuts are defined in yaml-to-systemd and can be set in this
+# file as well. The relevant keys are
+#   "shortcuts", "exec_pre", "timer_defaults", "service_defaults",
+#   "service_header", "systemd_dir", "systemctl_cmd", "dry_run"
+# Keys "shortcuts", "timer_defaults", "service_defaults" extend the defaults in
+# yaml-to-systemd while keys "exec_pre", "service_header", "systemd_dir",
+# "systemctl_cmd", "dry_run" override them.
+#
+# Time specification is given in man systemd.time.
+#
+# All top-level keys support array assignment, in which case the block is
+# *-expanded. For example, {a: [b, c], d: e} yields {a:b, d:e} and {a:c, d:e}.
+#
+# YAML:
+# - key: value format, can be done inline like {key1: value1, key2: value2}
+# - indentation matters
+# - types are inferred, quoting strings is optional
+# - control sequences are ': ', '[',']','{','}','*','&'. Explicit quoting allows
+#   them to be used in strings.
+# - use --- to separate timer/service blocks
+# - extends JSON
+
+exec_pre: "~/.config/systemd/user-env"
+---
+# reminders {{{1
+timer   : {OnCalendar: monthly}
+service : [
+  ExecStart: todo maxine heartworm,
+  ExecStart: todo oil barbell,
+  ExecStart: todo savings,
+]
+---
+timer   : {OnCalendar: quarterly}
+service : [
+  ExecStart: "todo Tech: backup (safe)",  # has ': ', so must quote
+  ExecStart: "todo Tech: recovery backup (safe)",
+  ExecStart: todo check mailbox,
+]
+---
+timer   : {OnCalendar: "*-01/6-01 00:00:00"}  # every 6 months (has '*', so must quote)
+service : [
+  ExecStart: todo charge car battery jumpers,
+  ExecStart: todo replace HVAC filters,
+  ExecStart: todo test sump pump,
+]
+---
+timer   : {OnCalendar: "*-03,09-01 00:00:00"}  # every March and September
+service : {ExecStart: todo check termite traps}
+---
+timer   : {OnCalendar: yearly}
+service : [
+  ExecStart: "todo Tech: rotate pictures",
+  ExecStart: todo inspect/sewer jetter wood room roof drains,
+]
+#----------------------------------------------------------------------------}}}1
+---
+# save the session state every 6 hours the computer is up
+timer   : {OnActiveSec: 6hr, OnUnitActiveSec: 6hr}
+service : {ExecStart: state-save}
+---
+# daily commands {{{1
+timer   : {OnCalendar: daily}
+service : [
+  # move ~/.xsession-errors to .log/ (ignore errors)
+  ExecStart: -mv ~/.xsession-errors ~/.log/xsession-errors,
+
+  # delete the trash directory
+  ExecStart: rm -rf ~/.local/share/Trash,
+
+  # delete mail in the trash folder after they are 100 days old
+  ExecStart: find ~/.mail/trash/ -ctime '+101' -type f -delete,
+
+  # delete files ~/.mutt/tmp that are older than 7 days
+  ExecStart: find ~/.mutt/tmp -type f -atime '+7' -delete,
+
+  # Delete files in ~/tmp that are older than 3 days. Since find updates the atime
+  # of dirs it enters, delete empty directories after we're done.
+  ExecStart: find ~/tmp/ -mindepth 1 -atime '+2' -delete -o -type d -empty -delete,
+
+  # reload mutt contacts from google
+  ExecStart: goobook reload,
+
+  # delete orphaned vim undofiles and swapfiles every day
+  ExecStart: _rm-orphaned-vimfiles,
+
+  # backup
+  ExecStart: remote-backup,
+
+  # make the quotes file into fortunes
+  ExecStart: ~/.fortunes/fortunify ~/quotes,
+
+  # check that the timers are healthy
+  ExecStart: _timers-check,
+
+  # check that there are no issues reported in the logs
+  ExecStart: _logs-check,
+]
+---
+# rotate logs in ~/.logs, but delay a little to avoid race conditions with other
+# daily commands
+timer   : {OnCalendar: daily, RandomizedDelaySec: 15min}
+service : {ExecStart: /usr/sbin/logrotate -s ~/.logrotate.state ~/.logrotate.conf}
+#--------------------------------------------------------------------------}}}1
+---
+# compact the notmuch index every week the computer is up
+timer   : {OnActiveSec: 1week, OnUnitActiveSec: 1week}
+service : {ExecStart: notmuch compact --quiet}
+---
+# every year rotate mail directories
+timer   : {OnCalendar: yearly}
+service : {ExecStart: _mail-yearly}

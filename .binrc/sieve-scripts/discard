@@ -1,0 +1,54 @@
+# variable 'account' must be set on command line
+
+require ["fileinto"];
+
+# don't discard mail that we've sent
+if address :contains "from" ["notmattmoore@gmail.com", "a91738246@gmail.com", "mtt.mre@gmail.com"] {
+  stop;
+}
+
+if anyof (
+  # from + subject {{{
+  # allof ( address :contains "from" "<++>", header :contains "subject" "<++>" ),
+  #
+  allof ( address :contains "from" "@e.avis.com", header :contains "subject" "Account Statement" ),
+  allof ( address :contains "from" "@email.blackhillsenergy.com", header :contains "subject" ["Your Black Hills Energy payment due date is approaching", "Your Black Hills Energy payment was received", "Your Black Hills Energy bill is available"] ),
+  allof ( address :contains "from" "PayPal@emails.paypal.com", header :contains "subject" "account statement" ),
+  allof ( address :contains "from" "USPSInformeddelivery@email.informeddelivery.usps.com", header :contains "subject" "Your Daily Digest for" ),
+  allof ( address :contains "from" "VSPVisionCare@e.vsp.com", header :contains "subject" "Newsletter" ),
+  allof ( address :contains "from" "citicards@info6.citi.com", header :contains "subject" "Your statement is available online" ),
+  allof ( address :contains "from" "idx@mg.idx.us", header :contains "subject" ["Your IDX Month in Review", "Your Month in Review"] ),
+  allof ( address :contains "from" "individualplan@aetnacvshealth.softheon.com", header :contains "subject" "Your Upcoming Autopay" ),
+  allof ( address :contains "from" "info@vspindividual.com", header :contains "subject" "Thank You for Your Recent VSP Payment" ),
+  allof ( address :contains "from" "mailman-owner@haskell.org", header :contains "subject" "reminder" ),
+  allof ( address :contains "from" "no-reply@alertsp.chase.com", header :contains "subject" "Your statement is ready" ),
+  allof ( address :contains "from" "noreply@mail.idnotify.com", header :contains "subject" "Your Monthly Update From IDnotify" ),
+  allof ( address :contains "from" "schwabbankbillpay@customercenter.net", header :contains "subject" "Payment date for" ),
+  allof ( address :contains "from" "schwabbankbillpay@customercenter.net", header :contains "subject" "You have a new eBill" ),
+  allof ( address :contains "from" "update@emailff.att-mail.com", header :contains "subject" "Your AT&T online bill is ready to be viewed" ),
+  allof ( address :contains "from" [ "discover@services.discover.com", "discover@card-e.em.discover.com" ], header :contains "subject" ["No new alerts this month", "Your Cashback Bonus was automatically redeemed as a statement credit", "Year-End Summary" ] ),
+  #--------------------------------------------------------------------------}}}
+  # from + to {{{
+  allof ( header :contains "from" "libcomm@ku.edu", header :contains "to" "kulsfa@ku.edu" ),
+  #--------------------------------------------------------------------------}}}
+  # from {{{
+  header :contains "from" [
+    "@agorize.com",
+    "@eliwise.ac",
+    "@himscsce.org",
+    "@nramedia.org",
+    "@pfeiffer-vacuum.com",
+    "@solidprofessor.com",
+    "@techguide.org",
+    "@ultimaker.com",
+    "michaels@emdeals.michaels.com"
+  ], # }}}
+  # subject {{{
+  header :contains "subject" [
+    "CTE News"
+  ] # }}}
+) {
+  fileinto "~/.mail/${account}/discard";
+}
+
+# vim: set ft=sieve:

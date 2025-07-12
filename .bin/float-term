@@ -1,0 +1,30 @@
+#!/bin/sh
+# Usage: float-term [-a|--all] [-w|--width <width>] [-h|--height <height>] <script> [args]
+# The script must be in the PATH or be full.
+
+name="float-term"
+geo_width=80
+geo_height=12
+
+usage() { # {{{
+cat <<EOF
+Usage: $(basename $0) [-a|--all] [-w|--width <width>] [-h|--height <height>] <script> [args]
+EOF
+} # }}}
+
+# read options
+while [ $# -gt 0 ]; do
+  case "$1" in
+    "-a" | "--all")      name="${name}-all" ;;
+    "-w" | "--width")    shift && geo_width=$1 ;;
+    "-h" | "--height")   shift && geo_height=$1 ;;
+    *)                   break ;;
+  esac
+  shift
+done
+
+script_name=$(basename "$1")
+
+eval kitty --name "$name" --title "$script_name" -o remember_window_size=no -o initial_window_width=${geo_width}c -o initial_window_height=${geo_height}c -- $@
+# eval xterm -name "$name" -title "$script_name" -geometry $geometry -e $@ 2>/dev/null
+# st -c "$classname" -n "$script_name" -t "$script_name" -g $geometry -e "$@" 2>/dev/null

@@ -1,0 +1,17 @@
+#!/bin/sh
+# Get a desktop name from the user and switch to it. Works with transient-term.
+
+fifo_name="/tmp/$(basename "$0")_${USER}"
+
+while true; do
+  desktop_name="$(wmctrl -d \
+    | awk '{print $9}' \
+    | grep -Fv 'NSP' \
+    | simple-filter --prompt 'Desktop: ')"
+
+  [ -n "$desktop_name" ] \
+    && wmctrl -s $(wmctrl -d | grep -m 1 "\<$desktop_name$" | awk '{print $1}') 1>/dev/null 2>&1 &
+
+  # signal the caller that we can go back to the scratch workspace
+  [ -p "$fifo_name" ] && echo "return" > "$fifo_name" || exit
+done

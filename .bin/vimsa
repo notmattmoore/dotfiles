@@ -1,0 +1,102 @@
+#!/usr/bin/python3
+# vimsa - vim standalone
+# Usage: vimsa [-h] [--verbose] [--font <font spec>] [--vim-args <args>] [FILES]
+# Description: Launch a terminal running tmux running vim on the FILES. If there
+#   are detached clients, recover them by opening a terminal and attaching to
+#   the tmux instance.
+__version__ = "2023-05-07"
+
+TERM_CMD = ["kitty"]
+TMUX_CMD = ["tmux", "-L", "vimsa"]
+VIM_CMD = ["vim"]
+TITLE_BASE = "vimsa"
+
+# imports {{{1
+import os
+import shlex
+import subprocess as sp
+
+from myutils import cmd
+#---------------------------------------------------------------------------}}}1
+
+def session_name_new():  # {{{
+  # find the desktop name
+  desktop = cmd("wmctrl -d 2>/dev/null | grep -Em 1 '^[0-9]+ +\*' | awk '{print $9}'")
+  if desktop == '':
+    return ''
+
+  # find how many vimsa sessions have names starting with the desktop name
+  n_desktop_sessions = len(cmd(
+    " ".join(TMUX_CMD) + " ls -F '#{session_name}' | grep ^" + desktop,
+    check=False
+  ).splitlines())
+
+  if n_desktop_sessions == 0:
+    return desktop
+  return f"{desktop}{n_desktop_sessions}"
+#----------------------------------------------------------------------------}}}
+def launch_vim(vim_args=[], recover=None):  # {{{
+  if recover:
+    tmux_args = ["attach", "-t", recover]
+    title_arg = []
+  else:
+    title = " ".join([TITLE_BASE] + vim_args)
+    title_arg = ["--title", title]
+    tmux_args = ["new-session", "-n", title]
+    if (session := session_name_new()) != '':
+      tmux_args.extend(['-s', session])
+    tmux_args.extend(VIM_CMD + vim_args + [";", "set-option", "status", "off"])
+
+  sp.Popen(TERM_CMD + title_arg + ["--"] + TMUX_CMD + tmux_args, stderr=stderr)
+#----------------------------------------------------------------------------}}}
+def recover_detached(): # {{{
+  try:
+    tmux_args = ["ls", "-F", "'#{session_attached} #{session_name}'"]
+    sessions = sp.check_output(TMUX_CMD + tmux_args, stderr=stderr).decode()
+    sessions = sessions.replace("'", '').splitlines()
+  except sp.CalledProcessError:
+    sessions = []
+
+  for session in sessions:
+    if session[0] == "0":     # if no clients are attached
+      recover = session[2:]   # the session name
+      print("Found detached vimsa session " + recover + ". Recovering...")
+      launch_vim(recover=recover)
+#----------------------------------------------------------------------------}}}
+
+
+if __name__ == "__main__":  # {{{1
+  # argument parsing {{{
+  import argparse
+
+  parser = argparse.ArgumentParser(description=
+    "Vim, standalone. Launch a terminal running tmux running vim. If there are "
+    "detached clients then recover them by opening new terminal windows and "
+    "attaching to the tmux instances."
+  )
+  parser.add_argument(
+    "-v", "--verbose", action="store_true",
+    help="don't suppress tmux and vim errors"
+  )
+  parser.add_argument(
+    "--no-recover", action="store_true",
+    help="don't attempt to recover orphaned vimsa sessions"
+  )
+  parser.add_argument(
+    '--term-args', metavar="<args>", type=str, default='',
+    help="additional arguments to " + TERM_CMD[0]
+  )
+  parser.add_argument("--version", action="version", version="%(prog)s " + __version__)
+
+  options, vim_args = parser.parse_known_args()
+
+  TERM_CMD += shlex.split(options.term_args)
+  # }}}
+
+  with open(os.devnull, 'w') as stderr:
+    if options.verbose:
+      stderr = sp.STDOUT
+    if not options.no_recover:
+      recover_detached()
+    launch_vim(vim_args=vim_args)
+#----------------------------------------------------------------------------}}}1

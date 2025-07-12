@@ -1,0 +1,20 @@
+#!/bin/sh
+# Open a floating vim window editing a temporary file. After the file is saved,
+# paste the contents into the previously active window.
+# Version: 2025-05-06
+
+vim_cmd="vim -c \"set noswapfile\" -c \"set noundofile\" -c \"set spell\" -c \"put!\""
+
+active_window_id=$( xprop -root _NET_ACTIVE_WINDOW | awk '{print $5}' )
+tmpfile=$(mktemp) && trap "rm -f \"$tmpfile\"" 0 1 2 3 15
+
+# Send C-a C-c to the window in order to copy all the text, then open vim to
+# edit the copied text (vim_cmd pastes the text already). Exit if the final file
+# is empty, otherwise load the clipboard with the file contents and activate the
+# window again.
+xdotool windowactivate --sync "$active_window_id" \
+  key --clearmodifiers --window "$active_window_id" Ctrl+a Ctrl+c
+float-term --all -w 84 -h 20 $vim_cmd $tmpfile
+[ ! -s $tmpfile ] && exit
+cat $tmpfile | xsel -b -i
+xdotool windowactivate $active_window_id

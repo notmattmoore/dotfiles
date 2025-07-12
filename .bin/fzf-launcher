@@ -1,0 +1,28 @@
+#!/bin/sh
+# Use fzf to filter a list of programs and run the result. Works with
+# transient-term.
+
+hist_file="$HOME/.binrc/fzf-launcher_history"
+hist_size=25
+
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
+  --bind=enter:replace-query+print-query --prompt='∴ '"
+
+name="$(basename "$0")"
+fifo_name="/tmp/${name}_${USER}"
+
+while true; do
+  run="$(cat "$hist_file" | fzf)"
+
+  # signal the caller that we can go back to the scratch workspace
+  [ -p "$fifo_name" ] && echo "return" > "$fifo_name" || exit
+
+  # If run is valid then run it and add the command to the history. Make sure
+  # that the history item is unique (grep -v).
+  if [ -n "$run" ] && command -v $run > /dev/null; then
+    setsid $run 1>/dev/null 2>&1 &
+    ( echo "$run"; grep -Fxv "$run" "$hist_file" ) \
+      | head -n $hist_size \
+      | sponge "$hist_file"
+  fi
+done

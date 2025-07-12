@@ -1,0 +1,16 @@
+#!/bin/sh
+
+display="$(ps --no-headers -f -C xinit | grep -E "^$USER" | grep -E -m 1 -wo ":[0-9]+")"
+
+case "$@" in 
+  "at "*) A="$(echo $@ | cut -c 4-)" ;;
+  "in "*) A="now + $(echo $@ | cut -c 4-)" ;;
+  *) A="now + $@" ;;
+esac
+
+(
+at "$A" << _EOF_
+#xmessage -display "$display" 'Reminder!'
+zenity --display=$display --info --text "Reminder!" >/dev/null 2>& 1
+_EOF_
+) 2>&1 | grep -Fv 'warning: commands will be executed using'

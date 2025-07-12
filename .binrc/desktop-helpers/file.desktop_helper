@@ -1,0 +1,4 @@
+#!/bin/sh
+# Helper for use with file.desktop
+
+RUN_FIRST="echo ${@}: ; cd $@ ; ls" QUIET=1 float-term -w 80 -h 15 zsh

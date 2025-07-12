@@ -1,0 +1,7 @@
+require "fileinto";
+
+if header :contains "subject" ["HW Submission", "Homework Submission", "Exam Submission"] {
+  fileinto "~/.mail/KU/Submissions";
+}
+
+# vim: set ft=sieve:

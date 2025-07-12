@@ -1,0 +1,29 @@
+#!/bin/sh
+# vim-gpg: edit a gpg encrypted file, re-encrypting if changes are made
+# Usage: vim-gpg file
+
+gpg_cmd="gpg -q"
+vim_cmd="vim -n -c \"set noswapfile | set noundofile | set foldlevel=0\" --"
+tmp_dir="/dev/shm"
+
+cleanup() { # {{{
+  rm "$plaintext" "$plaintext_copy" "$plaintext.gpg" 2>/dev/null
+}  # }}}
+
+# Decrypt the file. Make a copy so we can detect if it has changed.
+plaintext=$(mktemp -p $tmp_dir)
+plaintext_copy=$(mktemp -p $tmp_dir)
+if ! ($gpg_cmd -d "$1" > "$plaintext"); then  # if decryption fails
+  cleanup
+  exit 1
+fi
+cp "$plaintext" "$plaintext_copy"
+
+# edit the file
+eval $vim_cmd "$plaintext"
+
+# If the file has changed then re-encrypt it.
+cmp --silent "$plaintext" "$plaintext_copy" \
+  || $gpg_cmd -c --yes --output "$1" "$plaintext"
+
+cleanup

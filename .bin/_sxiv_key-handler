@@ -1,0 +1,30 @@
+#!/bin/sh
+# sxiv looks for ~/.config/sxiv/exec/key-handler. When C-x is pressed followed
+# by another key, sxiv runs
+#   $ <stream> | key-handler <other key>
+# where <stream> is either the list of marked filenames (in thumbnail mode) or
+# the current image filename.
+
+rotate() {  # {{{
+  degrees="$1"
+  tr '\n' '\0' | xargs -0 realpath | sort | uniq | while read f; do
+    case "$(file -bi "$f")" in
+      image/jpeg*)  jpegtran -rotate "$degrees" -copy all -outfile "$f" "$f"  ;;
+      *)            mogrify  -rotate "$degrees" "$f"  ;;
+    esac
+  done
+} # }}}
+
+case "$1" in
+  "C-d" | "d")  # delete
+    files="$(cat)"
+    zenity --width 300 --question --text "<big>Delete the following?</big>\n\n$files\n" > /dev/null 2>&1 \
+      && (echo "$files" | tr '\n' '\0' | xargs -0 rm)
+  ;;
+  "C-e" | "e")           tr '\n' '\0' | xargs -0 phototonic ;;  # edit
+  "C-y" | "y")           xargs realpath -s | xsel -ib       ;;  # yank path
+  "C-comma" | "comma")   rotate 270                         ;;  # rotate left
+  "C-period" | "period") rotate  90                         ;;  # rotate right
+  "C-slash" | "slash")   rotate 180                         ;;  # flip
+  # *) echo "$1" ;;  # fallback for debugging
+esac

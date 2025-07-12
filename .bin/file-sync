@@ -1,0 +1,125 @@
+#!/bin/zsh
+# Usage: file-sync [-n|--no-conf] [-l1|--loc1|-l2|--loc2 <path prefix>] pull|push
+# Recieve or send files to/from alpha. Source the file
+# ~/.binrc/file-pullsync/file-sync.$host for host-specific variables (incl.
+# filter). Allows for editing of the file list before transferring.
+#
+# Version: 2023-02-28
+
+# get host-specific settings
+source "$HOME/.binrc/file-pullsync/$(basename $0).$(hostname)"
+
+# defaults
+[ -z "$loc1" ] && loc1="alpha:$HOME/"
+[ -z "$loc2" ] && loc2="$HOME/"
+[ -z "$rsync_base" ] && rsync_base="rsync"
+[ -z "$rsync_opts" ] && rsync_opts="--archive \
+  --recursive \
+  --hard-links \
+  --one-file-system \
+  --delete \
+  --force \
+  --compress \
+  --human-readable"
+rsync_cmd="$rsync_base $rsync_opts"
+[ -z "$vim_cmd" ] && vim_cmd="vim -c \"set noswapfile | set noundofile\" --"
+
+script_name="$(basename "$0")"
+
+usage() { # {{{
+cat <<EOF
+$script_name: Send/recieve a list of files between two locations. Allow for
+editing the list of files before transfer.
+
+Location 1: $loc1
+Location 2: $loc2
+
+Usage: $script_name <options> pull|push
+
+Options:
+  -n | --no-conf        Don't edit the list of files before transfer
+  -l1 | --loc1 <path>   Set location 1 (default: $loc1)
+  -l2 | --loc2 <path>   Set location 2 (default: $loc2)
+EOF
+}  # }}}
+
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+# parse options {{{
+[ $# -eq 0 ] && usage && exit 1
+while [ $# -gt 0 ]; do
+  case "$1" in
+    "pull" | "push")      action="$1"        ;;
+    "-n" | "--no-conf")   no_confirm=1       ;;
+    "-l1" | "--loc1" )    shift && loc1="$1" ;;
+    "-l2" | "--loc2" )    shift && loc2="$1" ;;
+    *)                    usage && exit 1    ;;
+  esac
+  shift
+done
+
+if [ "$action" = "pull" ]; then
+  src="$loc2"
+  dest="$loc1"
+  desc="${bold}Receiving${normal} files from $loc2"
+elif [ "$action" = "push" ]; then
+  src="$loc1"
+  dest="$loc2"
+  desc="${bold}Sending${normal} files to $loc2"
+fi
+
+[ $no_confirm ] && desc="$desc (${bold}NO CONFIRMATION${normal})"
+#----------------------------------------------------------------------------}}}
+
+# If using ssh for either loc1 or loc2, then set up master mode for the session.
+ssh_master() {  # {{{
+  user_host="$@"
+
+  # If a user is not specified, then use $USER.
+  (echo "$user_host" | grep -Exq ".+@.+") || user_host="${USER}@${1}"
+
+  [ -n "$@" ] && [ ! -S "$HOME/.ssh/master-${user_host}:22" ] && ssh -MNf "$user_host"
+} # }}}
+ssh_master "$(echo "$loc1" | grep -Eo "^[[:alnum:].@]*")"
+ssh_master "$(echo "$loc2" | grep -Eo "^[[:alnum:].@]*")"
+
+# Set up the filter and run the initial rsync command.
+filter_file="$(mktemp "/tmp/$script_name.XXX")" \
+  && files_from="$(mktemp "/tmp/$script_name.XXX")" \
+  && trap "rm $filter_file; rm $files_from; exit" 0 1 2 3 15
+filter > "$filter_file"
+rsync_cmd="$rsync_cmd --filter=\"merge $filter_file\""
+
+echo "$desc"
+if [ ! $no_confirm ]; then
+  # Find out which files would be transferred. The first line and last 3 lines
+  # are not relevant, so we delete them. We also filter out directories.
+  file_list="$( \
+    eval "$rsync_cmd" --verbose --dry-run --out-format=%n "$src" "$dest" \
+    | sed '1d' \
+    | head -n -3 \
+    | grep -v '/$' )"
+  echo "# Files to transfer from $src to $dest (empty list cancels).\n$file_list" \
+    > "$files_from"
+  eval "$vim_cmd" "$files_from"
+
+  # strip comments/blank lines from $files_from
+  sed -E '/^\ *(#|$)/d' "$files_from" | sponge "$files_from"
+
+  # if $files_from is empty then exit
+  [ ! -s $files_from ] && exit
+
+  rsync_cmd="$rsync_cmd --files-from=\"$files_from\""
+fi
+
+# prompt the user to do the transfer
+while true; do
+  read "?Transfer files? [Y|n] " P
+  if [ -z "$P" -o "$P" = "y" -o "$P" = "Y" ]; then
+    eval "$rsync_cmd" --info=progress2 "$src" "$dest"
+    break
+  elif [ "$P" = "n" -o "$P" = "N" ]; then
+    break
+  fi
+done

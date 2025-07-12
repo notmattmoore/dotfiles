@@ -1,0 +1,17 @@
+#!/bin/sh
+# Create/attach to a tmux new session with the current desktop name.
+
+tmux_cmd="tmux"
+
+# try to determine the name of the desktop to use as session name
+desktop_name="$( wmctrl -d 2>/dev/null \
+  | grep -E -m 1 '^[0-9]+ +\*' \
+  | awk '{print $9}' )"
+[ -z "$desktop_name" -o "$desktop_name" = "zz" ] && exit
+
+# determine if a client is already attached
+attached="$(tmux list-clients -t "$desktop_name" 2>/dev/null | grep -E '[^ ]*attached[^ ]*$')"
+[ -n "$attached" ] && exit
+
+# run tmux (we use exec to replace this process)
+exec tmux new -As $desktop_name

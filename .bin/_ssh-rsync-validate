@@ -1,0 +1,26 @@
+#!/bin/sh
+# Validate incoming ssh rsync passwordless connections.
+# Version: 2023-03-07
+
+logfile="$HOME/.log/$(basename $0).log"
+
+log() {  # {{{
+  echo "$@" >> "$logfile"
+}  # }}}
+deny() {  # {{{
+  log "  Access Denied (failed validation)"
+  # output the failure to stderr as well
+  echo "Access Denied (failed validation)" >&2
+  exit 1
+}  # }}}
+
+log "On $(date +'%F %T')..."
+log "  From/To: $SSH_CONNECTION"
+log "  Command: $SSH_ORIGINAL_COMMAND"
+
+(echo "$SSH_ORIGINAL_COMMAND" | grep -Eqx 'rsync --server .*(\.bak|0_comp)/?') \
+  || (echo "$SSH_ORIGINAL_COMMAND" | grep -Eq '^rsync --server --sender') \
+  || deny
+
+log "  Access Granted"
+$SSH_ORIGINAL_COMMAND

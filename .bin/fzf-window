@@ -1,0 +1,32 @@
+#!/bin/bash
+# Usage: fzf-window bring|goto
+# Give an fzf prompt to select a window. Either go to the window or bring it to
+# the current desktop.
+
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --prompt='${1^} Window: '"
+
+print_windows() { # {{{
+# Print a list of windows in the form 'window_id [desktop_name] window_title'
+  IFS_prev="$IFS"
+  IFS=$'\n'
+  desktops=( $( wmctrl -d | awk '{print $9}' ) )
+  IFS="$IFS_prev"
+  wmctrl -l | while read -r win_id win_desktop _ win_title; do
+    win_desktop="${desktops[$win_desktop]}"
+    echo "$win_id [$win_desktop] $win_title"
+  done
+}  # }}}
+
+# print_windows gives us lines in the form 'id [desktop] name'. Tell fzf to only
+# show fields 2+ and to only search in fields 3+ (fields 2+ relative to the
+# omitted field). The effect of this is that id is hidden and dekstop name is
+# shown but not searched.
+win_id="$( print_windows | fzf --with-nth=2.. --nth=2..)"
+
+[ -z "$win_id" ] && exit
+
+if [ "$1" = "goto" ]; then
+  echo "$win_id" | xargs -d '\n' -I % -- wmctrl -i -a % 1>/dev/null 2>&1
+elif [ "$1" = "bring" ]; then
+  echo "$win_id" | xargs -d '\n' -I % -- wmctrl -i -R % 1>/dev/null 2>&1
+fi

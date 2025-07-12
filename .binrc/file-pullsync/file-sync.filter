@@ -1,0 +1,38 @@
+filter() {  # {{{
+# As the list of files/directories to transfer is built, rsync checks each name
+# against the filters. The first matching pattern is acted on. If no matching
+# pattern is found, then the filename is not skipped. Matches are for the
+# *destination* filename.
+#
+# Directory traversal is lazy, which is why the rules look funny.
+
+cat <<EOF
+# exclude all vim swap files
+- .*.sw?
+- **/.sw?
+
+- /*.Xauthority*
+- /*.Xresources*
+- /.cache/
+- /.config/dconf/
+- /.config/google-chrome/
+- /.config/pavucontrol.ini
+- /.config/pulse/
+- /.dbus/
+- /.log/
+- /.logrotate.state
+- /.mozilla/
+- /.mpd/pid
+- /.mpd/state
+- /.mtab*
+- /.ssh/known_hosts
+- /.ssh/master*
+- /*.xsession*
++ /.xmonad/xmonad.hs
+- /.xmonad/xmonad*
+
++ /***
+EOF
+}  # }}}
+
+# vim: set ft=zsh:

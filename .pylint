@@ -1,0 +1,95 @@
+[MASTER]
+jobs = 0  # use multiple processes (auto-detect)
+load-plugins = pylint.extensions.for_any_all,
+               pylint.extensions.redefined_loop_name
+
+[MESSAGES CONTROL]
+disable = attribute-defined-outside-init,
+          bare-except,
+          broad-except,
+          consider-iterating-dictionary,
+          consider-using-enumerate,
+          invalid-name,
+          isinstance-second-argument-not-valid-type,
+          line-too-long,
+          missing-class-docstring,
+          missing-function-docstring,
+          missing-module-docstring,
+          no-else-return,
+          possibly-unused-variable,
+          redefined-outer-name,
+          reimported,
+          singleton-comparison,
+          superfluous-parens,
+          too-few-public-methods,
+          too-many-arguments,
+          too-many-branches,
+          too-many-function-args,
+          too-many-instance-attributes,
+          too-many-lines,
+          too-many-locals,
+          too-many-return-statements,
+          too-many-statements,
+          unnecessary-lambda-assignment,
+          unspecified-encoding,
+          unused-import,
+          wrong-import-order,
+          wrong-import-position,
+
+[REPORTS]
+# template used to display messages (a python f-string).
+msg-template = "{path}:{line}: {obj} {msg} ({symbol})"
+score = no  # don't score the file
+
+[REFACTORING]
+
+[BASIC]
+argument-naming-style = snake_case
+#argument-rgx=
+attr-naming-style = snake_case
+#attr-rgx=
+class-attribute-naming-style = any
+#class-attribute-rgx=
+class-naming-style = PascalCase
+#class-rgx=
+const-naming-style = UPPER_CASE
+#const-rgx=
+function-naming-style = snake_case
+#function-rgx=
+inlinevar-naming-style = any
+#inlinevar-rgx=
+# Naming style matching correct method names.
+method-naming-style=snake_case
+#method-rgx=
+module-naming-style=snake_case
+#module-rgx=
+variable-naming-style=snake_case
+#variable-rgx=
+include-naming-hint = yes  # give a hint for the correct naming format
+
+[FORMAT]
+indent-after-paren = 4  # number of spaces inside a hanging or continued line
+indent-string = '  '    # 2 space indent
+
+[LOGGING]
+logging-format-style = new
+
+[MISCELLANEOUS]
+
+[SIMILARITIES]
+
+[SPELLING]
+
+[STRING]
+
+[TYPECHECK]
+
+[VARIABLES]
+
+[CLASSES]
+
+[DESIGN]
+
+[IMPORTS]
+
+[EXCEPTIONS]

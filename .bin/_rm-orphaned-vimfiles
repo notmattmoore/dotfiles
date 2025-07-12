@@ -1,0 +1,32 @@
+#!/bin/sh
+# Find and delete all orphaned vim undofiles and swapfiles.
+# Usage: rm-orphaned-vimfiles [--age <N>] [path]
+#
+# Version: 2025-06-23
+
+# defaults
+max_age=50
+search_path_default="$HOME"
+
+# option parsing  # {{{
+[ "$1" = "--age" ] && shift && max_age=$1 && shift
+[ $# -gt 0 ] && search_path="$@"
+
+[ -z "$search_path" ] && search_path="$search_path_default"
+#----------------------------------------------------------------------------}}}
+
+# delete undofiles that don't have a parent file
+find $search_path -xdev -type f -name '*.un~' | while read undofile ; do
+  f=$( echo "$undofile" | sed -r -e "s/\/\.([^\/]*)\.un~$/\/\1/" )
+  # if file $f does not exist...
+  [ ! -e "$f" ] && rm -v "$undofile"
+done
+
+# delete swapfiles that are older than $max_age
+max_age=$(($max_age-1))  # find uses > instead of >= for time comparisions
+find $search_path -xdev -type f -name '*.sw?' -atime +$max_age | while read swapfile; do
+  # if it is a vim swap file and is not currently open...
+  if [ $(file -b -p "$swapfile" | grep -ci "^vim") -eq 1 -a -n "$( lsof -t "$swapfile")" ]; then
+    rm -v "$swapfile"
+  fi
+done

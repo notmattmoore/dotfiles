@@ -1,0 +1,21 @@
+$include /etc/inputrc
+
+set colored-stats on
+set colored-completion-prefix on
+
+# use vim keys
+set editing-mode vi
+
+$if mode=vi
+# these are the vi-insert mode mappings
+set keymap vi-insert
+# make jk enter command mode
+"jk": vi-movement-mode
+
+# completion
+"\C-n": menu-complete
+"\C-p": menu-complete-backward
+
+# these are the vi-command mode mappings
+set keymap vi-command
+$endif

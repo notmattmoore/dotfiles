@@ -1,0 +1,4 @@
+#!/bin/sh
+
+convert -density 300 "$1" -quality 90 "$(basename "${1%%.pdf}").jpg"
+

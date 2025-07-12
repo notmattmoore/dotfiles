@@ -1,0 +1,31 @@
+#!/bin/zsh
+# Synchronize mail using mbsync and do other associated tasks
+
+update_interval=$((5 * 60))
+mail_dir="$HOME/.mail"
+sieve_dir="$HOME/.binrc/sieve-scripts"
+
+sieve_scripts() { # {{{
+  echo "Sieving..."
+  for acct in "notmattmoore" "a91738246"; do
+    sieve -f "$mail_dir/$acct/INBOX"             --variable=account=$acct -- "$sieve_dir/discard"
+    sieve -f "$mail_dir/$acct/[Gmail].Sent Mail" --variable=account=$acct -- "$sieve_dir/sent-mail"
+  done
+} # }}}
+countdown() { # {{{
+  remaining=$1
+  while [ $remaining -gt 0 ]; do
+    prompt="Next mail check in ${remaining}s. Press any key to check now."
+    remaining=$((remaining - 1))
+    read -t 1 -k -s "?$prompt" && remaining=0
+    printf "\r%*q\r" ${#prompt}
+  done
+} # }}}
+
+while true; do
+  echo "-- $(date +%F\ %T) --"
+  mbsync -a
+  sieve_scripts
+  notmuch new 2>/dev/null
+  countdown $update_interval
+done

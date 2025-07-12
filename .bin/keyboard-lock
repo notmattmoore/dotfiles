@@ -1,0 +1,52 @@
+#!/bin/bash
+# Lock the keyboard for a specified duration (or the default)
+# Usage: keyboard-lock [seconds]
+
+duration="10"
+
+
+
+
+xinput_cmd='xinput set-prop "AT Translated Set 2 keyboard" "Device Enabled"'
+
+# Enable the keyboard on exit and restore the cursor (used in countdown below)
+trap "keyboard_cmd 1; tput cnorm > /dev/tty; exit" 0 1 2 3 15
+
+usage(){ # {{{
+cat <<EOF
+Usage: $(basename $0) [seconds (default: $duration)]
+EOF
+} # }}}
+keyboard_cmd(){ # {{{
+  echo "Running $xinput_cmd $1 ..."
+  eval $xinput_cmd $1
+} # }}}
+sleep_countdown() { # {{{
+  duration=$1
+  shift
+  post="$@"
+
+  # Save cursor position and make cursor invisible.
+  tput sc && tput civis
+
+  remaining=$duration
+  while [ $remaining -gt 0 ]; do
+    # Place cursor at saved position, delete from cursor to last column
+    tput rc && tput ed && echo -n "$remaining $post"
+    remaining=$((remaining-1))
+    sleep 1
+  done
+  tput rc && tput ed && echo -n "$remaining $post"
+} # }}}
+
+
+if [ $# -eq 1 ]; then
+  duration=$1
+elif [ $# -gt 1 ]; then
+  usage && exit
+fi
+
+keyboard_cmd 0 \
+  && echo -n "Sleeping for " \
+  && sleep_countdown $duration "..." \
+  && echo ""

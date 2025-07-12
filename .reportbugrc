@@ -1,0 +1,7 @@
+reportbug_version "7.5.0"
+mode standard
+ui text
+realname "Matthew Moore"
+email "a91738246@gmail.com"
+mutt
+no-cc

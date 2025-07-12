@@ -1,0 +1,103 @@
+#!/bin/zsh
+# Check user logs and print out any errors that are found.
+
+log_dir="$HOME/.log"
+
+message_fmt() { # {{{
+  # Usage: message_fmt <prev message> <log filename> <errors>
+  [ -n "$1" ] && print "$1"
+  if [ -n "$3" ]; then
+    print "[$2] unusual log entries found:"
+    print "$3" | awk '{print "  "$0}'
+  fi
+} # }}}
+
+message=""
+
+# _inputplug-dispatcher.log {{{
+# every line should look like one of
+#  [2025-06-01 17:44:54] Setting up TPPS\/2 IBM TrackPoint (id=12).
+#  [2025-06-01 17:44:54] No action: XIDeviceEnabled 13 XISlaveKeyboard ThinkPad Extra Buttons.
+
+log_file="$log_dir/_inputplug-dispatcher.log"
+if [ -f "$log_file" ]; then
+  errors="$( grep -Ev '^\[[0-9]{4}(-[0-9]{2}){2} ([0-9]{2}:){2}[0-9]{2}\] (Setting up|No action:) ' "$log_file" )"
+  message="$(message_fmt "$message" "$log_file" "$errors")"
+fi
+#----------------------------------------------------------------------------}}}
+# _rm-orphaned-vimfiles.log {{{
+# non-error log entries look like
+#   removed '/home/mm/.config/systemd/user/.remote-backup.service.un~'
+log_file="$log_dir/_rm-orphaned-vimfiles.log"
+if [ -f "$log_file" ]; then
+  errors="$(grep -Ev '^removed ')"
+  message="$(message_fmt "$message" "$log_file" "$errors")"
+fi
+#----------------------------------------------------------------------------}}}
+# _ssh-rsync-validate.log {{{
+log_file="$log_dir/_ssh-rsync-validate.log"
+# Log entries are organized in 'paragraphs' with lagging indentation. We make
+# each paragraph into a line, and then search for ones that don't end with
+# "Access Granted".
+if [ -f "$log_file" ]; then
+  errors="$( cat "$log_file" \
+    | tr '\n' '\v' | sed 's/\v //g' | tr '\v' '\n' \
+    | grep -Ev 'Access Granted$' \
+  )"
+  message="$(message_fmt "$message" "$log_file" "$errors")"
+fi
+#----------------------------------------------------------------------------}}}
+# mpd.log {{{
+# non-error log entries look like
+#   Mar 26 12:22 : exception: Unsupported URI scheme
+#   Mar 26 12:22 : exception: Failed to open '/home/mm/.mpd/playlists/[Radio Streams].m3u': No such file or directory
+#   Mar 26 12:22 : exception: No such playlist
+#   Mar 28 10:49 : update: removing Cash, Johnny/2013.The Classic Christmas Album/01.Christmas as I Knew It.mp3
+log_file="$log_dir/mpd.log"
+if [ -f "$log_file" ]; then
+  errors="$( cat "$log_file" \
+    | grep -Fv " : update:" \
+    | grep -Fv " : exception: Unsupported URI scheme" \
+    | grep -Fv " : exception: Failed to open '/home/mm/.mpd/playlists/[Radio Streams].m3u': No such file or directory" \
+    | grep -Fv " : exception: No such playlist" \
+  )"
+  message="$(message_fmt "$message" "$log_file" "$errors")"
+fi
+#----------------------------------------------------------------------------}}}
+# msmtp.log {{{
+# non-error log entries look like
+#   Mar 06 14:12:40 host=smtp.gmail.com tls=on auth=on user=a91738246@gmail.com from=a91738246@gmail.com recipients=support@highstreetpharma.com mailsize=443 smtpstatus=250 smtpmsg='250 2.0.0 OK  1741291960 46e09a7af769-72a2db0c727sm383757a34.36 - gsmtp' exitcode=EX_OK
+# (exitcode=EX_OK at the end)
+log_file="$log_dir/msmtp.log"
+if [ -f "$log_file" ]; then
+  errors="$(grep -Ev 'exitcode=EX_OK$' "$log_file")"
+  message="$(message_fmt "$message" "$log_file" "$errors")"
+fi
+#----------------------------------------------------------------------------}}}
+# remote-backup.log {{{
+# A single run will produce a log entry of the form
+#   2025-06-03 00:00:01: Attempting to backup /home/mm/...
+#   < rsync verbose output >
+#   2025-06-03 00:00:13: Backup of /home/mm/ to omega.rsync succeeded.
+#   < rsync verbose output >
+#   2025-06-03 00:01:04: Backup of /home/mm/ to alephnull.rsync failed.
+# Lines ending in 'failed.' are errors.
+log_file="$log_dir/remote-backup.log"
+if [ -f "$log_file" ]; then
+  errors="$(grep -E 'failed.$' "$log_file" )"
+  message="$(message_fmt "$message" "$log_file" "$errors")"
+fi
+#----------------------------------------------------------------------------}}}
+# scratchpad.log {{{
+# non-error log entries look like
+#   2025-05-28 13:43:58: Setting SCRATCH property for ID 0x260004a
+#   2025-05-28 13:44:05: Unsetting SCRATCH property for ID 0x260004a
+log_file="$log_dir/scratchpad.log"
+if [ -f "$log_file" ]; then
+  errors="$( grep -Ev '^([0-9]|-|:)+: (Setting|Unsetting)' "$log_file" )"
+  message="$(message_fmt "$message" "$log_file" "$errors")"
+fi
+#----------------------------------------------------------------------------}}}
+
+[ -n "$message" ] && print "$message" && exit 1
+exit 0

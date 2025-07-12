@@ -1,0 +1,37 @@
+#!/bin/sh
+# To be used with inputplug. Upon a change to the XInput hierarchy, inputplug
+# To be used with inputplug. Upon a change to the XInput hierarchy, inputplug
+# runs a script with arguments
+#   <event-type> <device-id> <device-type> <device-name>.
+# This script parses these arguments and runs the appropriate configuration.
+#
+# Usage: inputplug -0c ~/.bin/_inputplug-dispatcher
+#
+# Version: 2022-05-05
+
+[ "$1" != "XIDeviceEnabled" ] && exit
+
+# log if not run interactively.
+if [ ! -t 0 ]; then
+  exec >> "$HOME/.log/$(basename $0).log" 2>&1
+  echo -n "[$(date +'%F %T')] "
+fi
+
+case "$4" in
+  *"TrackPoint")
+    trackpoint-setup $2
+  ;;
+  "Logitech M570")
+    logitech-m570-setup $2
+  ;;
+  "Logitech MX Ergo")
+    logitech-mx-ergo-setup  # appears as a pointer and keyboard, so don't give ID
+  ;;
+  "AT Translated Set 2 keyboard" | "Topre Corporation Realforce 87")
+    echo "Setting up $4."
+    xset r rate 250 50
+  ;;
+  *)
+    echo "No action: $@."
+  ;;
+esac

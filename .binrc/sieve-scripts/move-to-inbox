@@ -1,0 +1,7 @@
+require "fileinto";
+
+if    header :contains "from" "matthew.moore@ku.edu"   { fileinto "~/.mail/KU/INBOX"; }
+elsif header :contains "from" "notmattmoore@gmail.com" { fileinto "~/.mail/notmattmoore/INBOX"; }
+elsif header :contains "from" "a91738246@gmail.com"    { fileinto "~/.mail/a91738246/INBOX"; }
+
+# vim: set ft=sieve:

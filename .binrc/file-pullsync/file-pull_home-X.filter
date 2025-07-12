@@ -1,0 +1,75 @@
+# set of files in ~ to pull, to be used on systems with X installed
+
+filter() {  # {{{
+# As the list of files/directories to transfer is built, rsync checks each name
+# against the filters. The first matching pattern is acted on. If no matching
+# pattern is found, then the filename is not skipped. Matches are for the
+# *destination* filename.
+#
+# Directory traversal is lazy, which is why the rules look funny.
+
+cat <<EOF
+# exclude all vim swap files
+- .*.sw?
+- **/.sw?
+
++ /.Xresources
++ /.android/
++ /.android/adbkey
++ /.android/adbkey.pub
++ /.bin/***
++ /.binrc/***
++ /.config/
++ /.config/cantata/***
++ /.config/dunst/***
++ /.config/fontconfig/***
++ /.config/git/***
++ /.config/htop/***
++ /.config/mimeapps.list
++ /.config/nvim
++ /.config/kitty/***
++ /.config/sxhkd/***
++ /.config/sxiv/***
++ /.config/zathura/***
++ /.fortunes/***
++ /.inputrc
++ /.ipython/
++ /.ipython/profile_default/
++ /.ipython/profile_default/ipython_config.py
++ /.ipython/profile_default/startup/***
++ /.less
++ /.lesskey
++ /.local/
++ /.local/share/
++ /.local/share/nvim
++ /.local/share/nvim/site
++ /.logrotate.conf
++ /.mailcap
++ /.mpd/
++ /.mpd/mpdconf
++ /.mpdconf
++ /.nvim/***
++ /.pylint
++ /.reportbugrc
++ /.sane/***
+- /.ssh/known_hosts
+- /.ssh/master*
++ /.ssh/***
++ /.tmux.conf
++ /.vim/***
++ /.vimrc
++ /.wine***
++ /.xmobarrc
++ /.xmonad/
++ /.xmonad/xmonad.hs
+- /.xmonad/xmonad*
++ /.xmonad/**
++ /.zsh/
++ /.zsh/.zshrc
++ /.zshrc
+
+- /***
+EOF
+}  # }}}
+
+# vim: set ft=zsh:

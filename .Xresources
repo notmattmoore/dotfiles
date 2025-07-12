@@ -1,0 +1,41 @@
+*international: true
+
+Sxiv.background: #1f1f1f
+Sxiv.foreground: #dcdccc
+
+*URxvt*.foreground:        White
+*URxvt*.background:        Black
+*URxvt*.font:              xft:DejaVuSansMono:size=9
+*URxvt*.scrollBar:         false
+*URxvt*.jumpScroll:        true
+*URxvt*.scrollTtyKeypress: true
+*URxvt*.scrollTtyOutput:   false
+*URxvt*.scrollWithBuffer:  true
+
+Xcursor.theme: ComixCursors-Opaque-Black
+! T14 cursor size
+! Xcursor.size: 40
+! P1, X1C cursor size
+Xcursor.size: 55
+
+Xft.antialias: true
+Xft.autohint:  false
+! T14 dpi
+! Xft.dpi:       144
+! P1, X1C dpi
+Xft.dpi:       196
+Xft.hinting:   true
+Xft.hintstyle: hintfull
+Xft.lcdfilter: lcddefault
+Xft.rgba:      rgb
+
+*Xmessage*.defaultButton: okay
+
+*XTerm*.foreground:        White
+*XTerm*.background:        Black
+*XTerm*.faceName:          DejaVuSansMono:size=9
+*XTerm*.termName:          xterm-256color
+*XTerm*.fastScroll:        true
+*Xterm*.scrollTtyOutput:   false
+*XTerm*.bellIsUrgent:      true
+*XTerm*.*.metaSendsEscape: true

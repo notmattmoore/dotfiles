@@ -1,0 +1,44 @@
+#!/bin/sh
+# Version: 2025-06-13
+
+hosts="omega.rsync
+  alephnull.rsync"
+src="$HOME/"
+dest="/srv/backups/$(hostname)-$USER.bak/"
+filter="$HOME/.binrc/remote-backup.filter"
+rsync_cmd="rsync \
+  --archive \
+  --hard-links \
+  --delete \
+  --force \
+  --filter=\"merge $filter\" \
+  --compress \
+  --human-readable"
+
+# If run interactively then show progress, otherwise be verbose for logging.
+[ -t 0 ] \
+  && rsync_cmd="$rsync_cmd --info=progress2" \
+  || rsync_cmd="$rsync_cmd -v"
+
+# don't try backing up unless we're on wifi
+network_type="$(nmcli -t device status | grep -m 1 "connected" | cut -d ':' -f 2)"
+[ "$network_type" != "wifi" ] \
+  && echo "Connected to $network_type (not wifi), so not backing up." \
+  && exit 0
+
+# do the backups, keeping track of errors
+echo "Attempting to backup $src..."
+exit_code=0
+for host in $hosts; do
+  eval "$rsync_cmd" "$src" "$host:$dest" ; exit_code_loop=$?
+  # ugly hack to avoid "vanished files" error
+  if [ $exit_code_loop -eq 24 ] || [ $exit_code_loop -eq 0 ]; then
+    status="succeeded."
+  else
+    status="failed."
+    exit_code=1
+  fi
+  echo "Backup of $src to $host $status"
+done
+
+exit $exit_code
