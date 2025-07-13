@@ -1,0 +1,55 @@
+#!/bin/sh
+# Harass the user about git repos with changes.
+# usage: _git-harass [-h|--help] [-m|--mail] [dir]
+
+DIR_DEFAULT="$HOME"
+
+usage() { # {{{
+cat <<EOF
+Usage: $(basename "$0") [-h|--help] [-m|--mail] [dir]
+EOF
+} # }}}
+status_harass() { # {{{
+  # usage: status_harass [-m|--mail] <repo path> [git command suffix]
+
+  # argument parsing
+  [ "$1" = "-m" -o "$1" = "--mail" ] && do_mail=1 && shift
+  repo="$1" && shift
+  [ -z "$@" ] && git_cmd="git" || git_cmd="git $@"
+  git_cmd="$git_cmd -C $repo"
+
+  # if the repository has any changes, then send an email about it
+  if [ -n "$($git_cmd status --porcelain=1)" ]; then
+    echo "repository $repo has status:\n  $($git_cmd status --short)"
+    [ $do_mail ] \
+      && ($git_cmd status | mail -s "repository $repo" $USER)
+  fi
+} # }}}
+
+# argument parsing  # {{{
+DIR="$DIR_DEFAULT"
+while [ $# -gt 0 ]; do
+  case "$1" in
+    "-h" | "--help")  usage; exit    ;;
+    "-m" | "--mail")  mail_flag="$1" ;;
+    *)                [ ! -d "$1" ] && usage && exit 1 || DIR="$1" ;;
+  esac
+  shift
+done
+# only do the one-off repos if a directory argument has not been passed
+[ "$DIR" = "$DIR_DEFAULT" ] && do_one_off=1
+#----------------------------------------------------------------------------}}}
+
+# find all git repos and check status
+find "$DIR" -type d -name ".git" \
+  | xargs -I % -- dirname "%" \
+  | while read repo
+do
+  status_harass $mail_flag "$repo"
+done
+
+# git repos with non-standard git directories
+if [ $do_one_off ]; then
+  echo "one-off"
+  status_harass $mail_flag "$HOME" "--git-dir=$HOME/.git-dotfiles"
+fi
