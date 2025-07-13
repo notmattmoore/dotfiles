@@ -1,0 +1,15 @@
+[database]
+path=/home/mm/.mail
+
+[user]
+name=Matthew Moore
+primary_email=notmattmoore@gmail.com
+other_email=a91738246@gmail.com;matthew.moore@ku.edu
+
+[new]
+ignore=trash;arxiv;debian;xmonad
+
+[search]
+
+[maildir]
+synchronize_flags=true

@@ -1,0 +1,7 @@
+#!/bin/zsh
+# Wrapper script for systemd unit files. Will execute commands using the user's
+# path and any aliases that have been set in user-env.aliases.
+
+[ -e $HOME/.config/systemd/user-env.aliases ] && source $HOME/.config/systemd/user-env.aliases
+
+exec $@

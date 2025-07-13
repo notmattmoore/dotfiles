@@ -1,0 +1,4 @@
+[Desktop Entry]
+Type=Application
+Name=mutt
+Exec=float-term -w 85 -h 25 mutt

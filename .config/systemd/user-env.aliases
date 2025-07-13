@@ -1,0 +1,9 @@
+# QOL
+alias cp="cp --reflink=auto -i"
+alias mkdir="mkdir -p"
+alias rg="rg --no-messages --smart-case"
+
+# custom commands
+alias map="xargs -I % --"        # xargs shortcut
+alias rsend="rsync -ahz --partial --info=progress2"
+alias vnice="nice -n 20 ionice -c 3"

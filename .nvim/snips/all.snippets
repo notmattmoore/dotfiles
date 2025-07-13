@@ -1,0 +1,154 @@
+# Snippets that are defined for all files.
+
+# Use a priority lower than the default of 0 since these snippets are least
+# specialized.
+priority -1
+
+# global python functions {{{1
+global !p
+from random import randrange
+import string, neovim
+
+def parse_comments(s): # {{{
+  # Parses vim's comments option to extract comment format
+  i = iter(s.split(","))
+
+  rv = []
+  try:
+    while True:
+      # get the flags and text of a comment part
+      flags, text = next(i).split(':', 1)
+
+      if len(flags) == 0:
+        rv.append((text, text, text, ""))
+      # parse 3-part comment, but ignore those with O flag
+      elif flags[0] == 's' and 'O' not in flags:
+        ctriple = []
+        indent = ""
+
+        if flags[-1] in string.digits:
+          indent = " " * int(flags[-1])
+        ctriple.append(text)
+
+        flags,text = next(i).split(':', 1)
+        assert(flags[0] == 'm')
+        ctriple.append(text)
+
+        flags,text = next(i).split(':', 1)
+        assert(flags[0] == 'e')
+        ctriple.append(text)
+        ctriple.append(indent)
+
+        rv.append(ctriple)
+      elif flags[0] == 'b':
+        if len(text) == 1:
+          rv.insert(0, (text,text,text, ""))
+  except StopIteration:
+    return rv
+#----------------------------------------------------------------------------}}}
+def get_comment_format():  # {{{
+  # Returns a 4-element tuple representing the comment format for the current
+  # file.
+  return parse_comments(vim.eval("&comments"))[0]
+#----------------------------------------------------------------------------}}}
+def foldmarker(): # {{{
+  # Return a tuple of (open fold marker, close fold marker)
+  return vim.eval("&foldmarker").split(",")
+#----------------------------------------------------------------------------}}}
+
+def date_ymd(when="now"):  # {{{
+  cmd = ["date", "-I", "-d", when]
+  try:
+    return check_output(cmd)[:-1].decode()
+  except CalledProcessError:
+    return check_output(cmd[:2])[:-1].decode()
+#----------------------------------------------------------------------------}}}
+def date_md(when="now"):  # {{{
+  return date_ymd(when)[5:]
+#----------------------------------------------------------------------------}}}
+
+def arg_default(x, default=0): # {{{
+  if x == '':
+    return str(default)
+  return x
+#----------------------------------------------------------------------------}}}
+def overwrite_rt(d, s): # {{{
+  if len(s) == 0:
+    return d
+  return d[:-len(s)] + s
+#----------------------------------------------------------------------------}}}
+
+endglobal
+#---------------------------------------------------------------------------}}}1
+
+# folds ( use {x3, }x3, or {x3}x3 ) {{{1
+snippet "(^ *)fold" "Surround in folds" r
+`!p
+i = match.group(1)
+c = get_comment_format()[0]
+f = foldmarker()
+snip.rv = i+c
+` ${1:desc} `!p snip.rv = f[0]`${2}
+`!p snip.rv = i`${VISUAL}${3}
+`!p snip.rv = (i + c).ljust(80 - len(f+t[2]), '-') + f[1] + t[2]`
+endsnippet 
+
+snippet "\{{3}" "Insert open fold line" br
+`!p snip.rv = get_comment_format()[0]` ${1:desc} `!p snip.rv = foldmarker()[0]`
+endsnippet 
+
+snippet "([^ ] +)\{{3}" "Append an open fold mark" wr
+`!p snip.rv = match.group(1) + get_comment_format()[0] + " " + foldmarker()[0]`
+endsnippet
+
+snippet "^( *)\}{3}" "Insert close fold line" r
+`!p
+i = match.group(1)
+c = get_comment_format()[0]
+f = foldmarker()[1]
+snip.rv = (i + c).ljust(80 - len(f), '-') + f
+`
+endsnippet
+
+snippet "([^ ] +)\}{3}" "Append a close fold mark" wr
+`!p snip.rv = match.group(1) + get_comment_format()[0] + " " + foldmarker()[1]`
+endsnippet
+#---------------------------------------------------------------------------}}}1
+# parentheses pairs {{{1
+snippet () "( ... )" i
+(${VISUAL}${1})
+endsnippet
+
+snippet [] "[ ... ]" i
+[${VISUAL}${1}]
+endsnippet
+
+snippet {} "{ ... }" i
+{${VISUAL}${1}}
+endsnippet
+#----------------------------------------------------------------------------}}}1
+# command shortcuts {{{1
+snippet date "Insert the short date" w
+`date -I`
+endsnippet
+snippet fdate "Insert the full date" w
+`date`
+endsnippet
+snippet pw "Generate a password" w
+`pwgen`
+endsnippet
+snippet rand "Generate a random 16-bit number" w
+`!p if not snip.c: snip.rv = str(randrange(2**16))`
+endsnippet
+#---------------------------------------------------------------------------}}}1
+
+# lorem ipsum {{{1
+snippet lorem "Lorem Ipsum" w
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum.
+endsnippet
+#----------------------------------------------------------------------------}}}1

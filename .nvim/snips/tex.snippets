@@ -1,0 +1,119 @@
+# global python functions {{{1
+global !p
+from snippets_helpers import align_helper, label_make, parens_helper
+endglobal
+#---------------------------------------------------------------------------}}}1
+
+snippet $ "$ ... $" i
+\$${VISUAL}${1}\$
+endsnippet
+snippet $$ "$ ... $" iA
+\$${1:${VISUAL}}\$
+endsnippet
+
+snippet "\\fra?c?" "\frac{...}{...}" wr
+\frac{${VISUAL}${1}}{${2}}
+endsnippet
+
+snippet "\(+" "\left_ ... \right_" wr
+\\${1:left}${2:(} ${VISUAL}${3} \\`!p snip.rv=parens_helper(t)`
+endsnippet
+
+snippet ^ "^{...}" i
+^{${VISUAL}${1}}
+endsnippet
+snippet ^^ "^{...}" iA
+^{${VISUAL}${1}}
+endsnippet
+
+snippet _ "_{...}" i
+_{${VISUAL}${1}}
+endsnippet
+snippet __ "_{...}" iA
+_{${VISUAL}${1}}
+endsnippet
+
+# environments {{{1
+snippet \[ "\[ ... \]" b
+\[
+  ${VISUAL}${1}
+\]
+endsnippet
+
+snippet "\\b(e(g(i(n)?)?)?)?" "\begin{} ... \end{}" r
+\begin{${1:env}}
+  ${VISUAL}${2}
+\end{$1}
+endsnippet
+
+snippet "al(i(g(n)?)?)?" "\begin{align} ... \end{align}" br
+\begin{align${1:*}}
+`!p snip.rv=align_helper(snip.v.text)`${2}
+\end{align$1}
+endsnippet
+
+snippet "tab(u(l(a(r)?)?)?)?" "\begin{tabular} ... \end{tabular}" br
+\begin{tabular}[${1:alignment}]
+  ${VISUAL}${2}
+\end{tabular}
+endsnippet
+
+snippet "enum(e(r(a(t(e)?)?)?)?)?" "\begin{enumerate} ... \end{enumerate}" br
+\begin{enumerate}
+  \item $1
+\end{enumerate}
+endsnippet
+
+snippet "item(i(z(e)?)?)?" "\begin{itemize} ... \end{itemize}" br
+\begin{itemize}
+  \item $1
+\end{itemize}
+endsnippet
+#----------------------------------------------------------------------------}}}1
+# chapters, sections, subsections {{{1
+snippet "\\?chap(t(e(r)?)?)?" "\chapter{} \label{chap:}" br
+\chapter{${1:name}} \label{chap:`!p snip.rv=label_make(t)`} % {{{${2:1}
+$0
+%---------------------------------------------------------------------------}}}$2
+endsnippet
+
+snippet "\\?sec(t(i(o(n)?)?)?)?" "\section{} \label{sec:}" br
+\section{${1:name}} \label{sec:`!p snip.rv=label_make(t)`} % {{{${2:1}
+$0
+%---------------------------------------------------------------------------}}}$2
+endsnippet
+
+snippet "\\?sub(s(e(c(t(i(o(n)?)?)?)?)?)?)?" "\subsection{} \label{subsec:}" br
+\subsection{${1:name}} \label{subsec:`!p snip.rv=label_make(t)`} % {{{${2:2}
+$0
+%---------------------------------------------------------------------------}}}$2
+endsnippet
+#---------------------------------------------------------------------------}}}1
+
+# quantum {{{1
+priority -1
+
+snippet |> "\ket{ ... }" i
+\ket{${VISUAL}${1}}
+endsnippet
+snippet "\|([^|<>]+)>" "\ket{ ... }" ir
+\ket{`!p snip.rv = match.group(1)`}
+endsnippet
+snippet "\|([^|<>]+)" "\ket{ ... }" ir
+\ket{`!p snip.rv = match.group(1)`${1}}
+endsnippet
+
+snippet <| "\bra{ ... }" i
+\bra{${VISUAL}${1}}
+endsnippet
+snippet "<([^|<>]+)\|" "\bra{ ... }" ir
+\bra{`!p snip.rv = match.group(1)`}
+endsnippet
+snippet "<([^|<>]+)" "\bra{ ... }" ir
+\bra{`!p snip.rv = match.group(1)`${1}}
+endsnippet
+
+snippet <> "\bracket" i
+\bracket{${1}}{${2}}
+endsnippet
+#----------------------------------------------------------------------------}}}1

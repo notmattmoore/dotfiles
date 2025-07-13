@@ -1,0 +1,36 @@
+/* In about:config, set
+ *    toolkit.legacyUserProfileCustomizations.stylesheets 
+ * to true.
+ *
+ * Find Firefox UI CSS selectors:
+ * - Enable browser chrome and add-on debugging toolboxes
+ *   More tools -> Web Developer Tools -> ... menu -> Settings -> checkbox
+ * - Enable remote debugging:
+ *   More tools -> Web Developer Tools -> ... menu -> Settings -> checkbox
+ * - Open Browser Toolbox:
+ *   More tools -> Browser Toolbox
+ * - Don't autoclose popups:
+ *   Browser Toolbox -> ... menu -> Disable Popup Auto-Hide
+ * - Use selector in upper left corner to select UI elements
+ * - Right click -> Copy -> CSS Selector
+
+/* view */
+/* search */
+/* manage */
+/* sep */
+/* other */
+/* toolbar */
+/* sep */
+/* bookmarks */
+/* manage */
+
+#BMB_viewBookmarksSidebar,
+#BMB_searchBookmarks,
+#BMB_bookmarksShowAllTop,
+#BMB_bookmarksPopup > menuseparator:nth-child(4),
+#BMB_bookmarksToolbar,
+#BMB_unsortedBookmarks,
+#BMB_bookmarksPopup > menuseparator:nth-child(8)
+{
+    display: none !important;
+}

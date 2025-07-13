@@ -1,0 +1,15 @@
+#!/bin/sh
+# Usage: fortunify <quotes>
+# Processes a quotes file for use by fortune. Comments in the source file are
+# stripped out and replaced with a single '%'
+
+fortune_name="$HOME/.fortunes/$(basename "$1")"
+
+if [ "$1" -nt "$fortune_name.dat" ]; then
+  # replace comments with just a '%', create the data index, and print success
+  sed -E 's/^#.*/%/' "$1" > "$fortune_name" \
+    && strfile "$fortune_name" \
+    && echo "created fortunes from $1."
+else
+  echo "$1 has not been updated, so no need to make fortunes."
+fi

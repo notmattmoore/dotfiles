@@ -1,0 +1,15 @@
+#!/bin/sh
+# Wrapper to run Duke Nukem 3D via eduke32.
+# See also: ~/.config/eduke32/notes
+
+eduke32_path="$HOME/.config/eduke32"
+eduke32_cmd="$eduke32_path/eduke32 -j $eduke32_path/addons"
+
+xgamma -gamma 1.5
+$eduke32_cmd -j "$eduke32_path/alien_armageddon_4.67/"
+# $eduke32_cmd -gamegrp dukedc.grp
+# $eduke32_cmd -gamegrp vacation.grp
+# $eduke32_cmd -gamegrp penthous.grp
+# $eduke32_cmd -gamegrp nwinter.grp
+rm ./eduke32.log 2>/dev/null
+xgamma -gamma 1

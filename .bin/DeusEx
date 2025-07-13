@@ -1,0 +1,14 @@
+#!/bin/sh
+# https://appdb.winehq.org/objectManager.php?sClass=application&iId=186
+# might need to install winetricks mspatcha corefonts msxml6
+
+# Mods used:
+# - GMDX
+# - HDTP
+# - enhanced opengl rendered, http://cwdohnal.home.mindspring.com/utglr/
+
+export WINEPREFIX="$HOME/.wine-deusex"
+program="$WINEPREFIX/drive_c/Deus Ex/System/deusex.exe"
+
+wine "$program" -localdata -hax0r
+xgamma -gamma 1

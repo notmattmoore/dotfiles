@@ -1,0 +1,13 @@
+#!/bin/sh
+# attach or create a tmux session
+
+term_cmd="kitty --name SP-tmux"
+# term_cmd="xterm -name SP-tmux"
+
+if tmux has-session -t SP 2> /dev/null; then
+  $term_cmd -e tmux attach-session -t SP
+else
+  $term_cmd -e tmux new-session -s SP "htop"  \
+    \; new-window "dmesg -Htw"  \
+    \; new-window
+fi

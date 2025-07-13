@@ -1,0 +1,11 @@
+priority -50
+
+snippet "<([a-zA-Z]+)"  "<tag> </tag>" wr
+<`!p snip.rv = r = match.group(1)`>${1}</`!p snip.rv = r`>
+endsnippet
+snippet <  "<tag> </tag>" w
+<${1}>${2}</`!p snip.rv = t[1].split(' ')[0]`>
+endsnippet
+snippet <> "<tag> </tag>" wA
+<${1}>${2}</`!p snip.rv = t[1].split(' ')[0]`>
+endsnippet

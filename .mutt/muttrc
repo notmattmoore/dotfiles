@@ -1,0 +1,170 @@
+# global options  {{{1
+set folder = "$HOME/.mail/"                      # where the mail is kept
+set mbox_type = Maildir                          # use maildir
+source "$HOME/.mutt/mailboxes"                   # a file containing a list of mailboxes to watch for mail
+set trash = "+trash"                             # keep trash here
+set mailcap_path = "$HOME/.mailcap"              # viewer settings are stored here
+set header_cache = "$HOME/.mutt/cache/header"    # cache is supposed to speed things up
+set message_cachedir = "$HOME/.mutt/cache/body/" # ""
+set tmpdir = "$HOME/.mutt/tmp/"                  # keep things like unsent messages here
+set menu_scroll = yes                            # scroll menus
+set menu_context = 8                             # 8 lines of context in menus
+set wait_key = no                                # don't ask to press a key after external command
+set quit = ask-yes                               # confirm before quitting
+
+# colors
+source "$HOME/.mutt/muttcolors_zenburn"
+#----------------------------------------------------------------------------}}}1
+# formats {{{1
+set date_format = "%a %F %R"    # escape sequences taken from date command
+set folder_format="%t%N %f%*   (%s) %D"
+set index_format = "%S %?M?(+) %-22.22F&%-25.25F?  %s%*   (%c)  %D"
+set pager_format = "Sent %D  (sender local %d) %*   (%P)"
+set sidebar_format = "%B%*  %?N?%N/?%?S?%S?"
+set status_format = "%r  %f%?p?  Postponed: %p?%?n?  New: %n?%?R?  Read: %R?%*   (%P)"
+#----------------------------------------------------------------------------}}}1
+# history options {{{1
+set history_file = "$HOME/.mutt/mutthistory"  # store history here
+set save_history = 100                        # how much history to save
+#----------------------------------------------------------------------------}}}1
+# index options {{{1
+set auto_tag = yes                         # when messages are tagged, allow bulk actions
+set beep = no                              # don't beep
+set delete = yes                           # don't prompt to purge deleted messages
+set hide_thread_subject = yes              # don't show subject in threads if it hasn't changed
+set mail_check = 0                         # check for new mail all the time
+set mail_check_stats = yes                 # keep track of mail statistics
+set mark_old = no                          # don't mark new messages as old if I don't read them
+set move = no                              # don't automatically move things out of the spoolfile
+set reverse_alias = yes                    # show names from aliases if we have it
+set sleep_time = 0                         # don't pause between mailbox changes
+set sort = threads                         # sort by thread dates
+set sort_aux = reverse-last-date-received  # in the threads sort by last recieved
+set timeout = 15                           # after 15s of no keypresses, check for mail
+#----------------------------------------------------------------------------}}}1
+# sidebar options {{{1
+set sidebar_folder_indent = yes        # indent folders
+set sidebar_next_new_wrap = yes        # wrap sidebar-next-new function
+set sidebar_short_path = yes           # shorten the displayed folder paths
+set sidebar_visible = yes              # enable the sidebar
+set sidebar_width = 25                 # how many characters wide it should be
+color sidebar_new color109 color237    # colors compatible with zenburn scheme
+bind index,pager <Down> sidebar-next   # down a folder
+bind index,pager <Up> sidebar-prev     # up a folder
+bind index,pager <Right> sidebar-open  # open folder
+macro index,pager <Tab> <sidebar-next-new><sidebar-open> "change to next mailbox with new messages"
+macro index,pager <BackTab> <sidebar-prev-new><sidebar-open> "change to prev mailbox with new messages"
+macro index,pager <Esc>s "<enter-command>toggle sidebar_visible<Enter>" "toggle sidebar"
+#----------------------------------------------------------------------------}}}1
+# pager/viewer options  {{{1
+set pager_index_lines = 8  # show 8 mails of context while in the pager
+set pager_context = 8      # show 8 lines of context in the message pager
+set pager_stop = yes       # don't go to next message when we hit the bottom
+set pipe_decode = yes      # decode messages before piping them anywhere
+mime_lookup = application/octet-stream                # lookup these mime-types
+alternative_order text/plain text/enriched text/html  # show html last
+auto_view text/html text/calendar application/ics     # auto display these mime-types
+#----------------------------------------------------------------------------}}}1
+# compose options {{{1
+set editor = 'vim "+/^$/+" -c "noh"'  # use vim, position cursor on first blank line
+set sendmail = "/usr/bin/msmtp"       # send mail with msmtp
+# use goobook together with a local file for address lookup
+set query_command="goobook query '%s'; head -n -2 ~/.mutt/aliases | grep -i '%s'"
+set use_envelope_from = yes  # make mutt add -f to sendmail so it sends from the right account
+set edit_headers = yes       # edit headers during composition
+set reverse_name = yes       # reply with the address used in the TO/CC header
+set fast_reply = yes         # don't ask for subject or recipient when replying
+set include = yes            # include a copy of the message in replies
+set mime_forward = ask-no    # attach forwarded messages or put them inline?
+set recall = ask-yes         # ask about recalling postponed mail
+ignore *                     # ignore all headers
+unignore From:               # but don't ignore these headers
+unignore To:
+unignore Reply-to:
+unignore Mail-Followup-To:
+unignore CC:
+unignore BCC:
+unignore Subject:
+unignore Date:
+unignore Organization:
+unignore Newsgroups:
+unignore User-Agent:
+unignore X-Mailer:
+#----------------------------------------------------------------------------}}}1
+# multiple account options  {{{1
+set realname = "Matthew Moore"                  # appears as name in mails
+set from = "notmattmoore@gmail.com"             # default from
+set postponed = "+notmattmoore/[Gmail].Drafts"  # default drafts folder
+set record = "+notmattmoore/INBOX"              # by default store sent mail here
+
+# alternate email addresses
+alternates "^(notmattmoore|a91738246)@gmail.com"
+# alternates "^(notmattmoore|a91738246)@gmail.com" \
+#   "^(matthew.moore|m181m091)@ku.edu"
+
+# delete spam and duplicates
+folder-hook "+.*Spam" 'push "<tag-pattern>~A<Enter><purge-message>"'
+folder-hook "+.*Junk Email" 'push "<tag-pattern>~A<Enter><purge-message>"'
+folder-hook "+.*discard" 'push "<tag-pattern>~A<Enter><purge-message>"'
+folder-hook "." 'push "<delete-pattern>~=<enter>"'
+
+# mark 'old' messages as 'new' (i.e. disable old flag)
+folder-hook "." 'push "<tag-pattern>~O<Enter><set-flag>N<untag-pattern>~A<Enter><Home>"'
+
+# account folder hooks
+folder-hook "." 'macro index,pager i "<change-folder>+notmattmoore/INBOX<Enter>" "change folder to +notmattmoore/INBOX"'
+folder-hook "+notmattmoore/.*" 'source "$HOME/.mutt/muttrc_notmattmoore"'
+folder-hook "+notmattmoore/INBOX" 'macro index,pager I "<change-folder>+KU/INBOX<Enter>" "change folder to +KU/INBOX"'
+folder-hook "+a91738246/.*" 'source "$HOME/.mutt/muttrc_a91738246"'
+folder-hook "+a91738246/INBOX" 'macro index,pager I "<change-folder>+notmattmoore/INBOX<Enter>" "change folder to +notmattmoore/INBOX"'
+folder-hook "+KU/.*" 'source "$HOME/.mutt/muttrc_KU"'
+folder-hook "+KU/INBOX" 'macro index,pager I "<change-folder>+a91738246/INBOX<Enter>" "change folder to +a91738246/INBOX"'
+#----------------------------------------------------------------------------}}}1
+# key bindings and macros {{{1
+# overrides
+bind index % noop                              # don't set read-only
+bind index,pager j next-entry                  # don't skip deleted messages
+bind index,pager k previous-entry              # ""
+
+bind editor <Tab> complete-query               # tab completion of addresses
+bind index <Backspace> collapse-thread         # use backspace to collapse a thread
+bind index,pager <Space> next-new-then-unread  # space goes to next new mail
+bind index U untag-pattern                     # untag according to pattern 
+
+# save and copy
+macro index,pager s <save-message>? "save message/attachment to a mailbox/file"
+macro index,pager C <copy-message>? "copy a message to a file/mailbox"
+
+# archive message
+macro index,pager A "<save-message>+archival/INBOX<Enter>" "move message to archival INBOX"
+
+# change to default inbox
+macro index,pager i "<change-folder>+notmattmoore/INBOX<Enter>" "change folder to +notmattmoore/INBOX"
+macro index,pager I "<change-folder>+notmattmoore/INBOX<Enter>" "change folder to +notmattmoore/INBOX"
+
+# check mail
+macro index,pager <Esc>m "!mbsync -a<enter>" "run mbsync for all accounts"
+
+# open a copy of the message in vim
+macro index,pager \Co "<pipe-message> vim \"+/^$/+\" -c \"set ft=mail | set nowrap\" -<Enter>" "open message in vim"
+
+# extract and present links using urlscan instead of urlview (the default)
+macro index,pager \Cb "<pipe-message> urlscan<Enter>" "call urlscan to extract URLs from a message"
+macro attach,compose \Cb "<pipe-entry> urlscan<Enter>" "call urlscan to extract URLs from a message"
+
+# search using notmuch
+macro index S \
+"<enter-command>set nopipe_decode<Enter>\
+<shell-escape>notmuch-mutt -o $HOME/.mutt/notmuch-results --prompt search<Enter>\
+<change-folder-readonly>$HOME/.mutt/notmuch-results<Enter>\
+<enter-command>set pipe_decode<Enter>" \
+"notmuch: search mail"
+
+# reconstruct thread using notmuch
+macro index \Ct \
+"<enter-command>set nopipe_decode<Enter>\
+<pipe-message>notmuch-mutt -o $HOME/.mutt/notmuch-results thread<Enter>\
+<change-folder-readonly>$HOME/.mutt/notmuch-results<Enter>\
+<enter-command>set pipe_decode<Enter>" \
+"notmuch: reconstruct thread"
+#----------------------------------------------------------------------------}}}1

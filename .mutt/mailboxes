@@ -1,0 +1,37 @@
+# notmattmoore {{{
+mailboxes "+notmattmoore"
+mailboxes "+notmattmoore/INBOX"
+# mailboxes "+notmattmoore/[Gmail].Sent Mail"
+mailboxes "+notmattmoore/[Gmail].Drafts"
+mailboxes "+notmattmoore/[Gmail].Spam"
+mailboxes "+notmattmoore/ToDo"
+mailboxes "+notmattmoore/discard"
+#----------------------------------------------------------------------------}}}
+# a91738246 {{{
+mailboxes "+a91738246"
+mailboxes "+a91738246/INBOX"
+# mailboxes "+a91738246/[Gmail].Sent Mail"
+mailboxes "+a91738246/[Gmail].Drafts"
+mailboxes "+a91738246/[Gmail].Spam"
+mailboxes "+a91738246/The Economist"
+mailboxes "+a91738246/commerce"
+mailboxes "+a91738246/financial"
+mailboxes "+a91738246/discard"
+#----------------------------------------------------------------------------}}}
+# KU {{{
+# mailboxes "+KU"
+# mailboxes "+KU/INBOX"
+#mailboxes "+KU/Submissions"
+# mailboxes "+KU/Drafts"
+# mailboxes "+KU/Sent Items"
+# mailboxes "+KU/Junk Email"
+#----------------------------------------------------------------------------}}}
+# archival {{{
+mailboxes "+archival"
+mailboxes "+archival/INBOX"
+mailboxes "+archival/purchases"
+# mailboxes "+archival/teaching"
+#----------------------------------------------------------------------------}}}
+
+mailboxes "~/.mutt/notmuch-results"
+mailboxes "/var/mail/$USER"

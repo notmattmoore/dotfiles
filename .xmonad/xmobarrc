@@ -1,0 +1,16 @@
+Config {
+       font = "xft:Mono 18"   -- P1, X1C
+       -- font = "xft:Mono 14"  -- T14
+       , bgColor = "#1f1f1f"
+       , fgColor = "#dcdccc"
+       , commands =
+           [ Run Battery
+               [ "-t", "<left>% (<timeleft>)", "-L", "10", "-l", "red"
+               , "--" , "-p", "green" ] 300
+           , Run CommandReader "~/.xmonad/volume-loop" "vol"
+           , Run Date "%a %Y-%m-%d %R:%S" "date" 10
+           , Run XMonadLog ]
+       , alignSep = "}{"
+       , template = "}%XMonadLog%{<fc=#ffffff>•</fc> Batt: %battery% <fc=#ffffff>•</fc> Vol: %vol% <fc=#ffffff>•</fc> %date%"
+       , position = TopSize L 100 30
+       }

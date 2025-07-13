@@ -1,0 +1,11 @@
+#!/bin/sh
+# output volume % (or mute), and update when volume changes
+# depends on inotifywait from inotify-tools
+
+snd_dev="/dev/snd/controlC0"
+
+while [ -x /usr/bin/inotifywait ]; do
+  volumectl
+  # wait for someone to access the sound card...
+  inotifywait --quiet -e close_write "$snd_dev" > /dev/null 2>&1
+done

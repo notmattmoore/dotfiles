@@ -1,0 +1,4 @@
+[Desktop Entry]
+Type=Application
+Name=vim
+Exec=float-term -w 85 -h 25 vim

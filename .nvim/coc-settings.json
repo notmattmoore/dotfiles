@@ -1,0 +1,46 @@
+{
+  "diagnostic-languageserver.filetypes": {
+    "sh"     : "shellcheck"
+  },
+  "diagnostic-languageserver.linters": {
+    "pylint": {
+      "sourceName": "pylint",
+      "command": "pylint",
+      "debounce": 100,
+      "args": [
+        "--rcfile", "~/.pylint",
+        "--output-format", "text",
+        "--score", "no",
+        "--msg-template", "'{line}:{column}:{category}:{msg} ({msg_id}:{symbol})'",
+        "%file"
+      ],
+      "formatPattern": [
+        "^(\\d+?):(\\d+?):([a-z]+?):(.*)$",
+        {
+          "line": 1,
+          "column": 2,
+          "endColumn": 2,
+          "security": 3,
+          "message": 4
+        }
+      ],
+      "rootPatterns": ["pyproject.toml", "setup.py", ".git"],
+      "securities": {
+        "informational": "hint",
+        "refactor": "info",
+        "convention": "info",
+        "warning": "warning",
+        "error": "error",
+        "fatal": "error"
+      },
+      "offsetColumn": 1,
+      "offsetColumnEnd": 1,
+      "formatLines": 1
+    }
+  },
+  "diagnostic.enableMessage" : "jump",
+  "diagnostic.enableSign"    : false,
+  "hover.floatConfig"        : {"border" : true},
+  "suggest.autoTrigger"      : "none",
+  "suggest.noselect"         : true
+}

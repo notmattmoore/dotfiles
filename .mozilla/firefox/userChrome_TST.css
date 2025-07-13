@@ -1,0 +1,44 @@
+/* In about:config, set
+ *    toolkit.legacyUserProfileCustomizations.stylesheets 
+ * to true.
+ *
+ * Find Firefox UI CSS selectors:
+ * - Enable remote debugging:
+ *   More tools -> Web Developer Tools -> ... menu -> Settings -> checkbox
+ * - Open Browser Toolbox:
+ *   More tools -> Browser Toolbox
+ * - Don't autoclose popups:
+ *   Browser Toolbox -> ... menu -> Disable Popup Auto-Hide
+ * - Use selector in upper left corner to select UI elements
+ * - Right click -> Copy -> CSS Selector
+*/
+
+/* hide "View bookmarks sidebar", "Manage bookmarks", "Bookmarks toolbar",
+ * "Other bookmarks", and top menu separator */
+#BMB_viewBookmarksSidebar,
+#BMB_searchBookmarks,
+#BMB_bookmarksShowAllTop,
+#BMB_bookmarksPopup > menuseparator:nth-child(4),
+#BMB_bookmarksToolbar,
+#BMB_unsortedBookmarks,
+#BMB_bookmarksPopup > menuseparator:nth-child(8)
+{
+    display: none !important;
+}
+
+/* Tree Style Tab {{{1 */
+/* hide the vertical split */
+#sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"] + #sidebar-splitter {
+  display: none;
+}
+
+/* hide the header */
+#sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"] > #sidebar-header {
+  visibility: collapse;
+}
+
+/* hide native tab bar and title bar */
+#TabsToolbar, #titlebar {
+  visibility: collapse;
+}
+/* -----------------------------------------------------------------------}}} */

@@ -1,0 +1,32 @@
+#!/bin/sh
+# bgrun -- background viewer for mutt
+# usage: bgrun viewer [viewer options] file
+# Mutt views attachments in the foreground and waits for the viewer to
+# exit. This backgrounds the viewer so that mutt will not hang waiting
+# for the viewer to exit.
+
+if [ $# -lt 2 ]; then
+  echo "Usage: $(basename $0) viewer [viewer options] file." >&2
+  exit 1
+fi
+
+# First argument is viewer, the last is the file, and all in between are
+# options to the viewer.
+viewer="$1"
+shift
+while [ $# -gt 1 ]; do
+  options="$options $1"
+  shift
+done
+file="$1"
+
+# mutt deletes the file after viewing it, so we copy it to a temp file.
+tmpfile="$( mktemp --suffix=.${file##*.} )"
+cp "$file" "$tmpfile"
+
+# run viewer in the background and delete the temporary file after a bit.
+(
+  "$viewer" $options "$tmpfile"
+  sleep 60
+  rm -f "$tmpfile"
+) &

@@ -1,0 +1,17 @@
+#!/bin/sh
+# if trayer is running, kill it, and if it isn't running, run it
+
+prog_name="trayer"
+args="--edge top --align center --widthtype request --height 45 \
+  --expand true --SetDockType true --SetPartialStrut true \
+  --transparent true --alpha 0 --tint 0x1f1f1f"
+
+pid_file="${HOME}/.xmonad/$prog_name.pid"
+
+if [ -f "$pid_file" ]; then
+  kill $(cat "$pid_file")
+  rm "$pid_file"
+else
+  $prog_name $args &
+  echo "$!" > "$pid_file"
+fi

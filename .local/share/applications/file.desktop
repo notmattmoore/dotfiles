@@ -1,0 +1,4 @@
+[Desktop Entry]
+Type=Application
+Name=File Manager
+Exec=/home/mm/.binrc/desktop-helpers/file.desktop_helper

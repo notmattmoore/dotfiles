@@ -1,0 +1,48 @@
+#!/bin/sh
+# Version: 2025-06-03
+
+# log all output if not run interactively
+logfile="$HOME/.log/$(basename $0).log"
+if [ ! -t 0 ]; then
+  exec >> "$logfile" 2>&1
+fi
+
+active_window_id=$(xprop -root _NET_ACTIVE_WINDOW | awk '{print $5}')
+
+usage() { # {{{
+cat <<EOF
+Usage: scratchpad on|off|toggle <name>
+EOF
+}  # }}}
+scratch_on() {  # {{{
+  echo "$(date +%F\ %T): Setting SCRATCH property for ID $active_window_id"
+  xprop -id "$active_window_id" -f SCRATCH 8s -set SCRATCH True
+}  # }}}
+scratch_off() {  # {{{
+  echo "$(date +%F\ %T): Unsetting SCRATCH property for ID $active_window_id"
+  xprop -id "$active_window_id" -f SCRATCH 8s -set SCRATCH False
+}  # }}}
+scratch_toggle() {  # {{{
+  is_scratch=$(xprop -id "$active_window_id" SCRATCH | awk '{print $3}')
+  if [ "$is_scratch" = "\"True\"" ]; then
+    scratch_off
+  else
+    scratch_on
+  fi
+}  # }}}
+
+case "$1" in
+  "on")
+    scratch_on
+  ;;
+  "off")
+    scratch_off
+  ;;
+  "toggle")
+    scratch_toggle
+  ;;
+  *)
+    usage
+    exit 1
+  ;;
+esac
