@@ -1,0 +1,30 @@
+# html mail
+text/html; $HOME/.mutt/bgrun firefox -new-window %s; nametemplate=%s.html; test=test -n "$DISPLAY"
+text/html; $HOME/.mutt/bgrun links2 %s; nametemplate=%s.html
+text/html; w3m -T text/html; copiousoutput
+
+# pdf/dvi documents
+pdf/octet-stream; $HOME/.mutt/bgrun zathura %s; test=test -n "$DISPLAY"
+application/pdf; $HOME/.mutt/bgrun zathura %s; test=test -n "$DISPLAY"
+application/pdf; pdftotext %s -; copiousoutput
+application/x-dvi; $HOME/.mutt/bgrun zathura %s; test=test -n "$DISPLAY"
+
+# images
+image/*; $HOME/.mutt/bgrun sxiv -as f %s; test=test -n "$DISPLAY"
+
+# office
+application/vnd.ms-excel; $HOME/.mutt/bgrun localc %s; test=test -n "$DISPLAY"
+application/vnd.ms-excel.sheet.macroEnabled.; $HOME/.mutt/bgrun localc %s; test=test -n "$DISPLAY"
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; $HOME/.mutt/bgrun localc %s; test=test -n "$DISPLAY"
+application/vnd.oasis.opendocument.spreadsheet; $HOME/.mutt/bgrun localc %s; test=test -n "$DISPLAY"
+application/vnd.ms-powerpoint; $HOME/.mutt/bgrun loimpress %s; test=test -n "$DISPLAY"
+application/vnd.openxmlformats-officedocument.presentationml.presentation; $HOME/.mutt/bgrun loimpress %s; test=test -n "$DISPLAY"
+application/vnd.openxmlformats-officedocument.presentationml.slideshow; $HOME/.mutt/bgrun loimpress %s; test=test -n "$DISPLAY"
+application/vnd.oasis.opendocument.presentation; $HOME/.mutt/bgrun loimpress %s; test=test -n "$DISPLAY"
+application/msword; $HOME/.mutt/bgrun lowriter %s; test=test -n "$DISPLAY"
+application/rtf; $HOME/.mutt/bgrun lowriter %s; test=test -n "$DISPLAY"
+application/vnd.openxmlformats-officedocument.wordprocessingml.document; $HOME/.mutt/bgrun lowriter %s; test=test -n "$DISPLAY"
+application/vnd.oasis.opendocument.text; $HOME/.mutt/bgrun lowriter %s; test=test -n "$DISPLAY"
+
+# everything else
+text/*; vim %s
