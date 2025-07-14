@@ -82,14 +82,8 @@ let g:EasyTemplates_JumpBackwardTrigger = '<C-k>'
 " \gr, \gS         git rebase, stash
 " \gg              git command line interface
 " :Gw   write and stage file
-Plug 'tpope/vim-fugitive'
-" Plug 'tpope/vim-fugitive', {'on': ['Git']}
+Plug 'tpope/vim-fugitive', {'on': ['Git']}
 nnoremap <leader>gg :Git<CR>
-" nnoremap <leader>gm :Gmerge <Tab>
-" nnoremap <leader>gr :Grebase master
-" nnoremap <leader>gg :Git <Tab>
-" nnoremap <leader>gc :Git checkout <Tab>
-" nnoremap <leader>gS :Git stash
 
 Plug 'junegunn/gv.vim'
 

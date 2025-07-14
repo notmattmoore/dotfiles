@@ -235,6 +235,8 @@ alias onlyx="startx & vlock"
 alias pdflatexmk="latexmk -pvc -f -silent -pdflatex -synctex=1"
 alias rsend="rsync -ahz --partial --info=progress2"
 alias vess="vim -c 'set number' -"
+alias vim-git="vim -c 'Git' -c 'wincmd o'"
+alias vim-git-dotfiles="GIT_DIR=~/.git-dotfiles vim-git"
 function vman() { vim -c "Man $@|only"; }
 alias vnice="nice -n 20 ionice -c 3"
 
