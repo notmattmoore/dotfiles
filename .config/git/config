@@ -1,0 +1,7 @@
+[core]
+  sshCommand = "ssh -i ~/.ssh/git"
+[init]
+  defaultBranch = "master"
+[user]
+  email = notmattmoore@gmail.com
+  name = Matthew Moore

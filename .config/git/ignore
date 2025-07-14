@@ -1,0 +1,25 @@
+# generic
+*.bak
+*.lock
+
+# python
+*.pyc
+__pycache__/
+
+# tex
+*.aux
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.log
+*.out
+*.pdf
+*.ptc
+*.synctex.gz
+*.toc
+
+# vim
+*.sw?
+*.un~

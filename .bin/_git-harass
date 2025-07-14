@@ -20,9 +20,9 @@ status_harass() { # {{{
 
   # if the repository has any changes, then send an email about it
   if [ -n "$($git_cmd status --porcelain=1)" ]; then
-    echo "repository $repo has status:\n  $($git_cmd status --short)"
+    echo "repository $repo has status:\n$($git_cmd status --short)"
     [ $do_mail ] \
-      && ($git_cmd status | mail -s "repository $repo" $USER)
+      && ($git_cmd status | mail -s "repository $repo" "$USER")
   fi
 } # }}}
 
@@ -50,6 +50,5 @@ done
 
 # git repos with non-standard git directories
 if [ $do_one_off ]; then
-  echo "one-off"
   status_harass $mail_flag "$HOME" "--git-dir=$HOME/.git-dotfiles"
 fi

@@ -104,6 +104,10 @@ timer   : {OnCalendar: daily, RandomizedDelaySec: 15min}
 service : {ExecStart: /usr/sbin/logrotate -s ~/.logrotate.state ~/.logrotate.conf}
 #--------------------------------------------------------------------------}}}1
 ---
+# weekly harassment about uncommitted git repos
+timer   : {OnCalendar: weekly}
+service : {ExecStart: _git-harass --mail}
+---
 # compact the notmuch index every week the computer is up
 timer   : {OnActiveSec: 1week, OnUnitActiveSec: 1week}
 service : {ExecStart: notmuch compact --quiet}
