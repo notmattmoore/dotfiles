@@ -18,9 +18,16 @@ status_harass() { # {{{
   [ -z "$@" ] && git_cmd="git" || git_cmd="git $@"
   git_cmd="$git_cmd -C $repo"
 
-  # if the repository has any changes, then send an email about it
-  if [ -n "$($git_cmd status --porcelain=1)" ]; then
-    echo "repository $repo has status:\n$($git_cmd status --short)"
+  git_status="$($git_cmd status --short --branch)"
+  branch_status="$(echo "$git_status" \
+    | head -n 1 \
+    | grep -Eo '\[(ahead|behind) [0-9]+\]$')"
+  files_status="$(echo "$git_status" | sed 1d)"
+
+  # if the repository has any changes, then complain about it
+  if [ -n "$branch_status$files_status" ]; then
+    echo "repository $repo has status:"
+    $git_cmd status --short --branch | awk '{print "  "$0}'  # indent status output
     [ $do_mail ] \
       && ($git_cmd status | mail -s "repository $repo" "$USER")
   fi
@@ -41,7 +48,7 @@ done
 #----------------------------------------------------------------------------}}}
 
 # find all git repos and check status
-find "$DIR" -type d -name ".git" \
+find "$DIR" -type d -name ".git" -not -path "$DIR/.*" \
   | xargs -I % -- dirname "%" \
   | while read repo
 do
