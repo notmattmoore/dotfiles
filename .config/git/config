@@ -1,5 +1,3 @@
-[core]
-  sshCommand = "ssh -i ~/.ssh/git"
 [init]
   defaultBranch = "master"
 [user]
