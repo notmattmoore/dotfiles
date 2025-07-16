@@ -205,7 +205,7 @@ eval $(dircolors -b)
 
 autoload -Uz zmv          # programmable moving
 
-# QOL
+# QoL
 alias bc="bc -ql"
 alias cp="cp --reflink=auto -i"
 # alias crontab="crontab -i"  # see crontab function below (use yaml-to-systemd instead)
@@ -231,7 +231,7 @@ alias ls="ls --color=auto -hN --time-style=iso"
 # custom commands
 alias history="fc -i -n -l 1 -1" # show full history
 function crontab() { print "Use\n  $ yaml-to-systemd --user ~/.cronfile.yaml\ninstead." }
-alias git-dotfiles="git --git-dir=$HOME/.git-dotfiles"
+alias git-dotfiles="git --git-dir=$HOME/.git-dotfiles --work-tree=$HOME"
 alias map="xargs -I % --"        # xargs shortcut
 alias onlyx="startx & vlock"
 alias pdflatexmk="latexmk -pvc -f -silent -pdflatex -synctex=1"
