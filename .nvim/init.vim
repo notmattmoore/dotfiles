@@ -85,12 +85,11 @@ let g:EasyTemplates_JumpBackwardTrigger = '<C-k>'
 Plug 'tpope/vim-fugitive', {'on': ['Git']}
 nnoremap <leader>gg :Git<CR>
 
-Plug 'junegunn/gv.vim'
-
 " fzf integration for fuzzy finding
 " \f     open a file or buffer
 " <C-/>  search lines in current buffer
 " \<F1>  use fzf to search vim help
+Plug 'junegunn/fzf', {'do': { -> fzf#install() }}
 Plug 'junegunn/fzf.vim'
 let g:fzf_layout = { 'down': '~33%' }   " fzf window in the bottom 1/3
 let $FZF_DEFAULT_OPTS = '--inline-info --cycle --multi --bind=alt-enter:print-query,ctrl-space:replace-query,right:replace-query'
@@ -212,6 +211,7 @@ let g:vimtex_view_method = 'zathura'                    " use zathura to view pd
 let g:vimtex_compiler_latexmk = { 'continuous': 0 }     " disable continuous compilation
 let g:vimtex_quickfix_mode = 2                          " quickfix window doesn't steal focus
 let g:vimtex_syntax_conceal_disable = 1                 " don't use conceal mode to change characters!
+let g:vimtex_version_check = 0                          " don't check the vim version
 
 " zenburn color scheme
 Plug 'jnurmine/Zenburn'
