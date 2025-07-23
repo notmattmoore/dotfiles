@@ -209,8 +209,8 @@ autoload -Uz zmv          # programmable moving
 alias bc="bc -ql"
 alias cp="cp --reflink=auto -i"
 # alias crontab="crontab -i"  # see crontab function below (use yaml-to-systemd instead)
-alias datediff dateutils.ddiff
-alias dateseq dateutils.dseq
+alias datediff="dateutils.ddiff"
+alias dateseq="dateutils.dseq"
 alias firefox="firefox --new-window"
 alias info="info --vi-keys"
 alias less="less --mouse --ignore-case --chop-long-lines --shift .25 --LINE-NUMBERS --follow-name"
