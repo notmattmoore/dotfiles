@@ -3,9 +3,9 @@
 # Defaults and shortcuts are defined in yaml-to-systemd and can be set in this
 # file as well. The relevant keys are
 #   "shortcuts", "exec_pre", "timer_defaults", "service_defaults",
-#   "service_header", "systemd_dir", "systemctl_cmd", "dry_run"
+#   "unit_header", "systemd_dir", "systemctl_cmd", "dry_run"
 # Keys "shortcuts", "timer_defaults", "service_defaults" extend the defaults in
-# yaml-to-systemd while keys "exec_pre", "service_header", "systemd_dir",
+# yaml-to-systemd while keys "exec_pre", "unit_header", "systemd_dir",
 # "systemctl_cmd", "dry_run" override them.
 #
 # Time specification is given in man systemd.time.
