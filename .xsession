@@ -27,6 +27,7 @@ unclutter-xfixes &                    # hide the pointer after a key is pressed
 mpd                                   # music player, backgrounding makes it defunct
 nm-applet &                           # network manager applet
 blueman-applet &                      # bluetooth applet
+syncthingtray --wait &                # syncthing tray interface
 picom -b                              # compositor
 xmobar -x 1 &                         # the status bar
 export _JAVA_AWT_WM_NONREPARENTING=1  # Java programs don't run nicely without this
