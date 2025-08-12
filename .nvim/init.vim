@@ -211,7 +211,6 @@ let g:vimtex_view_method = 'zathura'                    " use zathura to view pd
 let g:vimtex_compiler_latexmk = { 'continuous': 0 }     " disable continuous compilation
 let g:vimtex_quickfix_mode = 2                          " quickfix window doesn't steal focus
 let g:vimtex_syntax_conceal_disable = 1                 " don't use conceal mode to change characters!
-let g:vimtex_version_check = 0                          " don't check the vim version
 
 " zenburn color scheme
 Plug 'jnurmine/Zenburn'
