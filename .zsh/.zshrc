@@ -1,18 +1,12 @@
-# Global exports {{{1
-export PATH="$PATH:/sbin:/usr/sbin:/usr/local/sbin:$HOME/.bin:$HOME/.local/bin"
-export ZDOTDIR="$HOME/.zsh"
-export LC_ALL="C.UTF-8"
-export EDITOR="vim"
-export BROWSER="firefox"
-export PDFVIEWER="zathura"
-export GPG_TTY="$(tty)"               # the tty used by gpg
-export _JAVA_AWT_WM_NONREPARENTING=1  # Java programs don't run nicely without this
-export FZF_DEFAULT_OPTS="--layout=reverse \
-  --inline-info \
-  --cycle \
-  --multi \
-  --bind=alt-enter:print-query,ctrl-space:replace-query,right:replace-query"
-#----------------------------------------------------------------------------}}}1
+# Custom keybindings
+# - <C-e>  launch editor for command line
+# - <C-n>, <C-p>  next/prev search mapping
+# - <C-f>, <C-/> <C-A-k>  launch fzf for filenames, history, of processes (kill)
+# 
+# Custom variables (used like: QUIET=1 zsh)
+# - QUIET: don't show todo/quotes
+# - RUN_FIRST: execute $RUN_FIRST, then enter an interactive shell
+
 # Prompt {{{1
 # valid colors are: red, green, yellow, blue, magenta, cyan, white
 autoload -Uz colors zsh/terminfo && colors
@@ -115,8 +109,7 @@ bindkey -M viins "\C-p" history-beginning-search-forward  # C-p
 
 # terminal-specific workarounds
 case $TERM in
-  # xterm doesn't seem to know home and end
-  "xterm"*)
+  "xterm"*)  # xterm doesn't seem to know home and end
     bindkey "^[[H" beginning-of-line # home
     bindkey "^[[F" end-of-line       # end
   ;;
@@ -200,53 +193,6 @@ if which fzf > /dev/null ; then
   bindkey -M viins "^[^k" fzf-processes   # C-A-k
 fi
 #----------------------------------------------------------------------------}}}1
-# Aliases and builtins {{{1
-eval $(dircolors -b)
-
-autoload -Uz zmv          # programmable moving
-
-# QoL
-alias bc="bc -ql"
-alias cp="cp --reflink=auto -i"
-# alias crontab="crontab -i"  # see crontab function below (use yaml-to-systemd instead)
-alias datediff="dateutils.ddiff"
-alias dateseq="dateutils.dseq"
-alias firefox="firefox --new-window"
-alias info="info --vi-keys"
-alias less="less --mouse --ignore-case --chop-long-lines --shift .25 --LINE-NUMBERS --follow-name"
-alias locate="locate --regex"
-alias mkdir="mkdir -p"
-alias mv="mv -i"
-alias rg="rg --no-messages --smart-case"
-alias sxiv="sxiv -a -o -s f"
-alias zathura="zathura --fork"
-
-# colors
-alias diff="diff --color=auto"
-alias grep="grep --color=auto"
-alias egrep="egrep --color=auto"
-alias ip="ip --color=auto"
-alias ls="ls --color=auto -hN --time-style=iso"
-
-# custom commands
-alias history="fc -i -n -l 1 -1" # show full history
-function crontab() { print "Use\n  $ yaml-to-systemd --user ~/.cronfile.yaml\ninstead." }
-alias git-dotfiles="git --git-dir=$HOME/.git-dotfiles --work-tree=$HOME"
-alias map="xargs -I % --"        # xargs shortcut
-alias onlyx="startx & vlock"
-alias pdflatexmk="latexmk -pvc -f -silent -pdflatex -synctex=1"
-alias rsend="rsync -ahz --partial --info=progress2"
-alias vess="vim -c 'set number' -"
-alias vim-git="vim -c 'Git' -c 'wincmd o'"
-alias vim-git-dotfiles="GIT_DIR=~/.git-dotfiles vim-git"
-function vman() { vim -c "Man $@|only"; }
-alias vnice="nice -n 20 ionice -c 3"
-
-# file shortcuts
-alias accounts.gpg="vim-gpg ~/personal/accounts.gpg"
-alias pii-matthew.gpg="vim-gpg ~/personal/records/personal-identity/matthew-notes.gpg"
-alias logins.gpg="vim-gpg ~/technical/logins.gpg"
-#----------------------------------------------------------------------------}}}1
 # Completion {{{1
 # cache completions
 zstyle ':completion:*' use-cache on
@@ -282,7 +228,22 @@ autoload -Uz compinit
 zmodload zsh/complist
 compinit
 #----------------------------------------------------------------------------}}}1
+# Colors {{{1
+eval $(dircolors -b)
+
+# colors
+alias diff="diff --color=auto"
+alias grep="grep --color=auto"
+alias egrep="egrep --color=auto"
+alias ip="ip --color=auto"
+alias ls="ls --color=auto -hN --time-style=iso"
+#----------------------------------------------------------------------------}}}1
 # Misc functions {{{1
+# file shortcuts
+alias accounts.gpg="vim-gpg ~/personal/accounts.gpg"
+alias logins.gpg="vim-gpg ~/technical/logins.gpg"
+alias pii-matthew.gpg="vim-gpg ~/personal/records/personal-identity/matthew-notes.gpg"
+
 # put the current working directory or the current program in the title bar
 precmd () {
   case $TERM in
