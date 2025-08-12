@@ -4,7 +4,7 @@
 # Description: Launch a terminal running tmux running vim on the FILES. If there
 #   are detached clients, recover them by opening a terminal and attaching to
 #   the tmux instance.
-__version__ = "2023-05-07"
+__version__ = "2025-08-11"
 
 TERM_CMD = ["kitty"]
 TMUX_CMD = ["tmux", "-L", "vimsa"]
@@ -16,17 +16,17 @@ import os
 import shlex
 import subprocess as sp
 
-from myutils import cmd
+import mylibs.utils as mu
 #---------------------------------------------------------------------------}}}1
 
 def session_name_new():  # {{{
   # find the desktop name
-  desktop = cmd("wmctrl -d 2>/dev/null | grep -Em 1 '^[0-9]+ +\*' | awk '{print $9}'")
+  desktop = mu.cmd("wmctrl -d 2>/dev/null | grep -Em 1 '^[0-9]+ +*' | awk '{print $9}'")
   if desktop == '':
     return ''
 
   # find how many vimsa sessions have names starting with the desktop name
-  n_desktop_sessions = len(cmd(
+  n_desktop_sessions = len(mu.cmd(
     " ".join(TMUX_CMD) + " ls -F '#{session_name}' | grep ^" + desktop,
     check=False
   ).splitlines())
