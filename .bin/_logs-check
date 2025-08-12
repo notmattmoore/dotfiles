@@ -49,17 +49,18 @@ fi
 #----------------------------------------------------------------------------}}}
 # mpd.log {{{
 # non-error log entries look like
-#   Mar 26 12:22 : exception: Unsupported URI scheme
-#   Mar 26 12:22 : exception: Failed to open '/home/mm/.mpd/playlists/[Radio Streams].m3u': No such file or directory
-#   Mar 26 12:22 : exception: No such playlist
-#   Mar 28 10:49 : update: removing Cash, Johnny/2013.The Classic Christmas Album/01.Christmas as I Knew It.mp3
+# 2025-08-11T11:24:15 update: : exception: Unsupported URI scheme
+# 2025-08-11T11:24:15 exception: Failed to open '/home/mm/.mpd/playlists/[Radio Streams].m3u': No such file or directory
+# 2025-08-11T11:24:15 exception: No such playlist
+# 2025-08-11T11:24:15 update: removing Cash, Johnny/2013.The Classic Christmas Album/01.Christmas as I Knew It.mp3
 log_file="$log_dir/mpd.log"
 if [ -f "$log_file" ]; then
   errors="$( cat "$log_file" \
-    | grep -Fv " : update:" \
-    | grep -Fv " : exception: Unsupported URI scheme" \
-    | grep -Fv " : exception: Failed to open '/home/mm/.mpd/playlists/[Radio Streams].m3u': No such file or directory" \
-    | grep -Fv " : exception: No such playlist" \
+    | grep -Fv " update:" \
+    | grep -Fv " exception: Unsupported URI scheme" \
+    | grep -Fv " exception: Failed to open '/home/mm/.mpd/playlists/[Radio Streams].m3u': No such file or directory" \
+    | grep -Fv " exception: No such playlist" \
+    | grep -Fv "Warning: Xing stream size off by more than 1%, fuzzy seeking may be even more fuzzy than by design!" \  # workaround
   )"
   message="$(message_fmt "$message" "$log_file" "$errors")"
 fi
