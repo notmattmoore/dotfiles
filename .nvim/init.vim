@@ -301,6 +301,7 @@ set statusline+=\ %3p%%               " ' '<percent of file current line is at>%
 "---------------------------------------------------------------------------}}}1
 " interface settings {{{1
 colorscheme zenburn               " use zenburn
+hi StatusLine guibg=#dfdfdf gui=bold  " more muted statusline bg color
 set clipboard=unnamedplus         " use the clipboard (Ctrl-C) by default
 set colorcolumn=+1                " color column 1 to the right of textwidth
 set omnifunc+=syntaxcomplete#Complete  " use syntax completion
