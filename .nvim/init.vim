@@ -358,7 +358,6 @@ set mouse=a                            " support the mouse in all modes
 set shell=/usr/bin/zsh                 " the shell to use
 set dictionary+=/usr/share/dict/words  " dictionary of words for auto-completion
 set spelllang=en                       " spelling language
-let &printheader=" "                   " don't include a header when making ps files
 "---------------------------------------------------------------------------}}}1
 " autocommands {{{1
 " formatoptions gets overwritten by certain filetype plugins. This fixes it.
@@ -455,6 +454,7 @@ if !has('nvim')
   set smarttab                    " insert the 'correct' tab character
   set ttyfast                     " tell vim we're on a fast terminal
   set wildmenu                    " do fancy command line completion
+  let &printheader=" "            " don't include a header when making ps files
 endif
 "----------------------------------------------------------------------------}}}1
 " nvim specific options {{{1
