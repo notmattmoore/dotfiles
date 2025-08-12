@@ -3,12 +3,12 @@
 # Read from standard input, put it in a vim instance, and then execute the
 # results upon exit. Log all things run this way.
 # Usage: vsh [--no-log] [--last|-l|--history|-h|--execute|-e|<file>]
-# Version: 2022-03-16
+# Version: 2025-08-12
 
 vim_cmd='vim -c "set noswapfile" -c "set noundofile" -c "set ft=zsh"'
-script_header='read -q "?Run script? [y/N] " || exit; source $HOME/.binrc/vsh.aliases'
-logsep_top="-- $(date +%F\ %T) ------------------------------------------------------------------"
-logsep_bot="--------------------------------------------------------------------------------"
+script_header='read -q "?Run script? [y/N] " || exit'
+logsep_top="# -- $(date +%F\ %T) ----------------------------------------------------------------"
+logsep_bot="# ------------------------------------------------------------------------------"
 logfile="$HOME/.log/vsh.log"
 
 usage() { # {{{
