@@ -21,7 +21,7 @@ import mylibs.utils as mu
 
 def session_name_new():  # {{{
   # find the desktop name
-  desktop = mu.cmd("wmctrl -d 2>/dev/null | grep -Em 1 '^[0-9]+ +*' | awk '{print $9}'")
+  desktop = mu.cmd("wmctrl -d 2>/dev/null | grep -Em 1 '^[0-9]+ +\\*' | awk '{print $9}'")
   if desktop == '':
     return ''
 
