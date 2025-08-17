@@ -80,9 +80,8 @@ let g:EasyTemplates_JumpBackwardTrigger = '<C-k>'
 " fugitive for git integration
 " \gg              interactive git status
 " \gr, \gS         git rebase, stash
-" \gg              git command line interface
 " :Gw   write and stage file
-Plug 'tpope/vim-fugitive', {'on': ['Git']}
+Plug 'tpope/vim-fugitive'
 nnoremap <leader>gg :Git<CR>
 
 " fzf integration for fuzzy finding
