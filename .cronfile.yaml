@@ -79,9 +79,6 @@ service : [
   # of dirs it enters, delete empty directories after we're done.
   ExecStart: find ~/tmp/ -mindepth 1 -atime '+2' -delete -o -type d -empty -delete,
 
-  # reload mutt contacts from google
-  ExecStart: goobook reload,
-
   # delete orphaned vim undofiles and swapfiles every day
   ExecStart: _rm-orphaned-vimfiles,
 
