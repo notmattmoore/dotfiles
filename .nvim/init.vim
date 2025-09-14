@@ -78,14 +78,14 @@ let g:EasyTemplates_JumpForwardTrigger = '<C-j>'
 let g:EasyTemplates_JumpBackwardTrigger = '<C-k>'
 
 " fugitive for git integration
-" \gg              interactive git status
-" \gr, \gS         git rebase, stash
-" :Gw   write and stage file
+" \gg  interactive git status
+" :Gw  write and stage file
 Plug 'tpope/vim-fugitive'
 nnoremap <leader>gg :Git<CR>
 
 " fzf integration for fuzzy finding
 " \f     open a file or buffer
+" \gc    git commits (visual select lines to show changes in the range)
 " <C-/>  search lines in current buffer
 " \<F1>  use fzf to search vim help
 Plug 'junegunn/fzf', {'do': { -> fzf#install() }}
@@ -93,6 +93,7 @@ Plug 'junegunn/fzf.vim'
 let g:fzf_layout = { 'down': '~33%' }   " fzf window in the bottom 1/3
 let $FZF_DEFAULT_OPTS = '--inline-info --cycle --multi --bind=alt-enter:print-query,ctrl-space:replace-query,right:replace-query'
 nnoremap <leader>f :Files<CR>
+nnoremap <leader>gc :Commits<CR>
 nnoremap <C-_> :BLines<CR>
 nnoremap <leader><F1> :Helptags<CR>
 
