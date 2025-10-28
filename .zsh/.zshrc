@@ -1,3 +1,5 @@
+# This file is sourced by interactive shells only.
+#
 # Custom keybindings
 # - <C-e>  launch editor for command line
 # - <C-n>, <C-p>  next/prev search mapping

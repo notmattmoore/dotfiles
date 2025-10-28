@@ -1,3 +1,6 @@
+# This file gets sources by all invocations of zsh, including scripts and
+# interactive shells.
+
 # Global exports {{{1
 export PATH="$PATH:/sbin:/usr/sbin:/usr/local/sbin:$HOME/.bin:$HOME/.local/bin"
 export ZDOTDIR="$HOME/.zsh"
