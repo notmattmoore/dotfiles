@@ -1,6 +1,0 @@
-loc1="$HOME/"
-loc2="alpha:$HOME/"
-
-source "$HOME/.binrc/file-pullsync/file-sync.filter"
-
-# vim: set ft=zsh:

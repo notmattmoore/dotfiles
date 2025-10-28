@@ -1,6 +1,6 @@
 # set of files in ~ to pull, to be used on systems with X installed
 
-filter() {  # {{{
+filter() {
 # As the list of files/directories to transfer is built, rsync checks each name
 # against the filters. The first matching pattern is acted on. If no matching
 # pattern is found, then the filename is not skipped. Matches are for the
@@ -70,6 +70,6 @@ cat <<EOF
 
 - /***
 EOF
-}  # }}}
+}
 
 # vim: set ft=zsh:

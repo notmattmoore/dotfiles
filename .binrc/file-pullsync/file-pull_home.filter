@@ -16,24 +16,11 @@ cat <<EOF
 + /.android/
 + /.android/adbkey
 + /.android/adbkey.pub
-+ /.bin/
-+ /.bin/_rm-orphaned-vimfiles
-+ /.bin/_ssh-rsync-validate
-+ /.bin/file-pull
-+ /.bin/file-sync
-+ /.bin/fix-it
-+ /.bin/pcalc
-+ /.bin/remote-backup
-+ /.bin/vim-gpg
-+ /.bin/vsh
-+ /.binrc/
-+ /.binrc/file-pullsync/***
-+ /.binrc/remote-backup.filter
-+ /.binrc/vsh.aliases
++ /.bin/***
++ /.binrc/***
 + /.config/
 + /.config/git/***
 + /.config/htop/***
-+ /.config/kitty/***
 + /.config/nvim
 + /.inputrc
 + /.ipython/
@@ -61,6 +48,6 @@ cat <<EOF
 
 - /***
 EOF
-}  # }}}
+}
 
 # vim: set ft=zsh:

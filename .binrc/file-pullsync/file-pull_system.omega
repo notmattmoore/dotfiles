@@ -2,7 +2,7 @@ src="mm@alpha:/"
 dest="/"
 rsync_base="sudo rsync -e 'ssh -i /home/mm/.ssh/id_ed25519'"
 
-filter() {  # {{{
+filter() {
 # As the list of files/directories to transfer is built, rsync checks each name
 # against the filters. The first matching pattern is acted on. If no matching
 # pattern is found, then the filename is not skipped. Matches are for the
@@ -15,8 +15,7 @@ cat <<EOF
 + aliases
 + /etc/apt/
 + /etc/apt/sources.list
-# + /etc/bluetooth/
-# + /etc/bluetooth/main.conf
+# + /etc/cronfile.yaml
 # + /etc/cups/
 # + /etc/cups/cupsd.conf
 + /etc/default/
@@ -27,15 +26,11 @@ cat <<EOF
 + /etc/default/sec
 + /etc/default/zramswap
 # + /etc/fstab
-+ /etc/fwupd/
-+ /etc/fwupd/uefi_capsule.conf
 # + /etc/gpm.conf
 # + /etc/hosts
 + /etc/inputrc
 # + /etc/nohang/
 # + /etc/nohang/nohang-desktop.conf
-# + /etc/samba/
-# + /etc/samba/smb.conf
 # + /etc/sane.d/
 # + /etc/sane.d/dll.conf
 + /etc/sec.conf
@@ -44,16 +39,15 @@ cat <<EOF
 + /etc/sysctl.d/
 + /etc/sysctl.d/local.conf
 # + /etc/systemd/
-# + /etc/systemd/journald.conf
-# + /etc/systemd/logind.conf
+# + /etc/systemd/logind.conf.d/***
+# + /etc/systemd/sleep.conf.d/***
 + /etc/systemd/system/
 + /etc/systemd/system/failure-notify@.service
 + /etc/systemd/system/failure-notify@.service.d/***
 # + /etc/systemd/system/gpm.path
 # + /etc/systemd/system/gpm.service.d/***
 # + /etc/systemd/system/hibernate-swap.service
-+ /etc/systemd/system/service.d/
-+ /etc/systemd/system/service.d/failure-notify.conf
++ /etc/systemd/system/service.d/***
 # + /etc/systemd/system/sleep-local.service
 # + /etc/systemd/system/slock@.service
 # + /etc/systemd/system/systemd-logind.service.d/***
@@ -61,30 +55,16 @@ cat <<EOF
 + /etc/updatedb.conf
 + ImageMagick-6/policy.xml
 
-# + /root/***
++ /root/***
 
 + /usr/
 + /usr/local/
-# + /usr/local/bin/***
-+ /usr/local/bin/
-# + /usr/local/bin/brightness
-+ /usr/local/bin/snapshot-recover
-+ /usr/local/bin/systemd-failure-notify
-+ /usr/local/bin/vim.classic
-+ /usr/local/bin/yaml-to-systemd
++ /usr/local/bin/***
 + /usr/local/lib/***
-# + /usr/local/sbin/***
-+ /usr/local/sbin/
-+ /usr/local/sbin/btrfs-snapshot
-+ /usr/local/sbin/btrfs-snapshot-chroot
-+ /usr/local/sbin/btrfs-snapshot-now
-+ /usr/local/sbin/snapshot
-+ /usr/local/sbin/subvolume-rm
-
-# + /var/spool/cron/crontabs/mm
++ /usr/local/sbin/***
 
 - /***
 EOF
-}  # }}}
+}
 
 # vim: set ft=zsh:
