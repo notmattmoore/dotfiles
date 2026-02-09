@@ -14,7 +14,7 @@ cat <<EOF
 + /etc/
 + aliases
 + /etc/apt/
-+ /etc/apt/sources.list
++ /etc/apt/sources.list.d/***
 # + /etc/cronfile.yaml
 # + /etc/cups/
 # + /etc/cups/cupsd.conf
