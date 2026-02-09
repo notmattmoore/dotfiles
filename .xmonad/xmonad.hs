@@ -379,6 +379,7 @@ myManageHook = myFloats <+> namedScratchpadManageHook scratchpads
 
 myFloats = composeOne [ isDialog -?> doFloat
                       , appName =? "xmessage" -?> centerFloat
+                      , appName =? "zenity" -?> centerFloat
                       , appName =? "float-term" -?> doCenterFloat
                       , appName =? "float-term-all" -?> doCenterFloatToAll
                       , appName =? "transient-term" -?> doCenterFloat ]
