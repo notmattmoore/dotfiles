@@ -1,4 +1,4 @@
-# This file gets sources by all invocations of zsh, including scripts and
+# This file gets sourced by all invocations of zsh, including scripts and
 # interactive shells.
 
 # Global exports {{{1
