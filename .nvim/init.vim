@@ -97,6 +97,9 @@ nnoremap <leader>gc :Commits<CR>
 nnoremap <C-_> :BLines<CR>
 nnoremap <leader><F1> :Helptags<CR>
 
+" nice indentation guides (see line require("ibl").setup() below)
+Plug 'lukas-reineke/indent-blankline.nvim'
+
 " markdown-preview for live-preview of markdown files. Requires nodejs.
 " \mv   toggle preview (set in after/ftplugin/markdown.vim)
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npx --yes yarn install' }
@@ -289,6 +292,9 @@ let g:zenburn_unified_CursorColumn = 1  " make the cursorcolumn fit in
 "Plug 'tpope/vim-unimpaired'
 "----------------------------------------------------------------------------}}}
 call plug#end()
+
+" post vim-plug configuration
+lua require("ibl").setup()
 "---------------------------------------------------------------------------}}}1
 " status line {{{1
 set statusline=%t                     " <tail of the filename>
