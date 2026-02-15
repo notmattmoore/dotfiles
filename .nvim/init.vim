@@ -60,17 +60,17 @@ nnoremap <silent><nowait><expr> <C-u> coc#float#has_scroll() ? coc#float#scroll(
 inoremap <silent><nowait><expr> <C-u> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0,5)\<cr>" : "\<Left>"
 let g:coc_disable_startup_warning = 1   " don't bother me about the version
 
+" commentary for easy commenting
+" gc{motion}  comment lines that motion moves over
+" gcc         comment lines
+Plug 'tpope/vim-commentary'
+
 " Dispatch for running async compilations
 " \c  save and run :Dispatch (background compile)
 Plug 'tpope/vim-dispatch'
 let g:dispatch_no_maps = 1       " disable default maps
 let g:dispatch_no_tmux_make = 1  " prefer job support over tmux
 nnoremap <leader>c :w<CR>:Dispatch<CR>
-
-" commentary for easy commenting
-" gc{motion}  comment lines that motion moves over
-" gcc         comment lines
-Plug 'tpope/vim-commentary'
 
 " EasyTemplates
 " <C-j>, <C-k>   select next/prev <+...+>
